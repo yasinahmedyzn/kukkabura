@@ -1,12 +1,11 @@
-import './App.css'
-
+import "./App.css";
+import Navbar from "../Header/Navbar";
 function App() {
-
   return (
     <>
-      <h1 className='text-red-500'>Hello world!</h1>
+      <Navbar />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
