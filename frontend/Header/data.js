@@ -7,16 +7,16 @@ export const links = [
   {
     id: 2,
     url: "/about",
-    text: "form-data",
+    text: "about",
   },
   {
     id: 3,
     url: "/services",
-    text: "fetch-data",
+    text: "product",
   },
   {
     id: 4,
     url: "/contact",
-    text: "demo",
+    text: "contact",
   },
 ];
