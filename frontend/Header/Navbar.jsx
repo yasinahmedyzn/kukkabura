@@ -1,101 +1,153 @@
-import React, { useState } from "react";
-import { links } from "./data";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  FaSearch,
+  FaHeart,
+  FaGift,
+  FaShoppingCart,
+  FaBars,
+} from "react-icons/fa";
+import { Link } from "react-router-dom";
 import logo from "../Images/logo.svg";
-import { useCart } from "react-use-cart";
 
 const Navbar = () => {
-  const [show, setShow] = useState(false);
-  const { totalUniqueItems } = useCart();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
-    <header className="w-full bg-white shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-[7vh] relative">
-        {/* Logo */}
-        <div className="flex-shrink-0">
-          <a href="/">
-            <img
-              src={logo}
-              alt="main logo"
-              className="h-auto w-32 sm:w-40 object-contain"
-            />
-          </a>
-        </div>
-
-        {/* Desktop Nav */}
-        <nav className="hidden md:block">
-          <ul className="flex space-x-8">
-            {links.map(({ id, url, text }) => (
-              <li key={id}>
-                <a
-                  href={url}
-                  className="text-gray-800 hover:text-blue-600 transition"
-                >
-                  {text}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        {/* Desktop Icons */}
-        <div className="hidden md:flex items-center space-x-6">
-          <a href="/cart" className="relative">
-            <i className="fas fa-cart-plus text-xl"></i>
-            {totalUniqueItems > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                {totalUniqueItems}
-              </span>
-            )}
-          </a>
-          <a href="/login">
-            <i className="fa-solid fa-user text-xl"></i>
-          </a>
-        </div>
-
-        {/* Mobile Toggle */}
-        <button
-          className="md:hidden text-2xl focus:outline-none"
-          onClick={() => setShow((s) => !s)}
-        >
-          {show ? (
-            <i className="fa fa-times"></i>
-          ) : (
-            <i className="fa fa-bars"></i>
-          )}
-        </button>
-
-        {/* Mobile Nav */}
-        {show && (
-          <nav className="absolute top-full left-0 w-full bg-white shadow-md md:hidden z-10">
-            <ul className="flex flex-col p-4 space-y-4">
-              {links.map(({ id, url, text }) => (
-                <li key={id}>
-                  <a
-                    href={url}
-                    className="block text-gray-800 hover:text-blue-600 transition"
-                  >
-                    {text}
-                  </a>
-                </li>
-              ))}
-            </ul>
-            <div className="border-t mt-2 pt-2 flex items-center justify-around">
-              <a href="/cart" className="relative">
-                <i className="fas fa-cart-plus text-xl"></i>
-                {totalUniqueItems > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                    {totalUniqueItems}
-                  </span>
-                )}
-              </a>
-              <a href="/login">
-                <i className="fa-solid fa-user text-xl"></i>
-              </a>
+    <>
+      {/* Main Navbar */}
+      <nav className="bg-transparent shadow-sm">
+        <div className="w-full max-w-[1320px] mx-auto px-4 py-3 flex items-center justify-between">
+          {/* Logo & Categories */}
+          <div className="flex items-center gap-4 relative" ref={dropdownRef}>
+            {/* Logo */}
+            <div className="flex-shrink-0">
+              <Link to="/">
+                <img
+                  src={logo}
+                  alt="main logo"
+                  className="h-24 sm:h-24 w-auto object-contain"
+                />
+              </Link>
             </div>
-          </nav>
-        )}
+
+            {/* Categories Button */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowDropdown(!showDropdown)}
+                aria-haspopup="true"
+                aria-expanded={showDropdown}
+                className="flex items-center gap-1 text-sm font-bold text-black px-3 py-1 rounded-lg bg-white hover:shadow-md transition-all"
+              >
+                <FaBars />
+                Categories
+              </button>
+
+              {/* Dropdown */}
+              {showDropdown && (
+                <div
+                  className="absolute top-16 left-0 z-50 w-64 max-h-[400px] overflow-y-auto rounded-md bg-white shadow-xl border border-gray-200 transition-all"
+                >
+                  <ul className="text-sm text-gray-800 font-medium">
+                    {[
+                      "Accessories",
+                      "Art & Collectibles",
+                      "Baby",
+                      "Bags & Purses",
+                      "Bath & Beauty",
+                      "Books, Movies & Music",
+                      "Clothing",
+                      "Craft Supplies & Tools",
+                      "Electronics & Accessories",
+                      "Gifts",
+                      "Home & Living",
+                      "Jewelry",
+                    ].map((item) => (
+                      <li
+                        key={item}
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      >
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Search Bar */}
+          <div className="flex-1 mx-6">
+            <div className="flex items-center border rounded-full overflow-hidden shadow-sm">
+              <input
+                type="text"
+                placeholder="Search for anything"
+                className="w-full px-4 py-2 focus:outline-none"
+              />
+              <button
+                className="px-4 py-2 text-gray-700 transition duration-300 hover:text-orange-600"
+                type="button"
+                style={{
+                  transition: "all 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.filter =
+                    "drop-shadow(0 0 6px rgba(255,115,0,0.8))";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.filter = "none";
+                }}
+              >
+                <FaSearch />
+              </button>
+            </div>
+          </div>
+
+          {/* Icons */}
+          <div className="flex items-center gap-6 text-gray-700 text-sm">
+            <button className="hover:underline" type="button">
+              Sign in
+            </button>
+            <FaHeart className="cursor-pointer" />
+            <FaGift className="cursor-pointer" />
+            <FaShoppingCart className="cursor-pointer" />
+          </div>
+        </div>
+      </nav>
+
+      {/* Bottom Category Links */}
+      <div className="py-3 shadow-sm bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex justify-center gap-8 text-sm font-medium text-gray-700">
+            {[
+              { label: "Home", path: "/" },
+              { label: "About", path: "/about" },
+              { label: "Product", path: "/product" },
+              { label: "Service", path: "/service" },
+            ].map(({ label, path }) => (
+              <Link
+                key={label}
+                to={path}
+                className="cursor-pointer rounded-md px-2 py-1 transition-colors duration-300 ease-in-out hover:text-orange-600 hover:underline"
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
-    </header>
+    </>
   );
 };
 

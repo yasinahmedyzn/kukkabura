@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 const products = [
   {
     id: 1,
@@ -71,6 +72,7 @@ export default function Example() {
                 <p className="text-sm font-medium text-gray-900">
                   {product.price}
                 </p>
+            
               </div>
             </div>
           ))}
