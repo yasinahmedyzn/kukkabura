@@ -1,41 +1,64 @@
+
 import { Link } from "react-router-dom";
 const products = [
   {
     id: 1,
-    name: "Basic Tee",
+    name: "Mirrors",
     href: "#",
     imageSrc:
-      "https://tailwindcss.com/plus-assets/img/ecommerce-images/product-page-01-related-product-01.jpg",
+      "http://t2.gstatic.com/images?q=tbn:ANd9GcRchbtYJar5Hi7o-rBbLOrASGGcO48KtsEbJYm2fCDRfvcGyUFR",
     imageAlt: "Front of men's Basic Tee in black.",
     price: "$35",
-    color: "Black",
+    color: "Red",
   },
   {
     id: 2,
-    name: "Basic Tee",
+    name: "Clock",
     href: "#",
     imageSrc:
-      "https://tailwindcss.com/plus-assets/img/ecommerce-images/product-page-01-related-product-02.jpg",
+      "http://t3.gstatic.com/images?q=tbn:ANd9GcTG5qR08wgHkC3vXnmYhf0ZR3sCnQW7IQ5sVfTjuro7r2tkHMUo",
     imageAlt: "Front of men's Basic Tee in white.",
     price: "$35",
     color: "Aspen White",
   },
   {
     id: 3,
-    name: "Basic Tee",
+    name: "Pots and planters",
     href: "#",
     imageSrc:
-      "https://tailwindcss.com/plus-assets/img/ecommerce-images/product-page-01-related-product-03.jpg",
+      "https://www.ikea.com/global/assets/range-categorisation/images/flower-pots-planters-pp004.jpeg?imwidth=300",
     imageAlt: "Front of men's Basic Tee in dark gray.",
     price: "$35",
     color: "Charcoal",
   },
   {
     id: 4,
-    name: "Artwork Tee",
+    name: "Wall decor",
     href: "#",
     imageSrc:
-      "https://tailwindcss.com/plus-assets/img/ecommerce-images/product-page-01-related-product-04.jpg",
+      "https://www.ikea.com/global/assets/range-categorisation/images/wall-decor-10757.jpeg?imwidth=300",
+    imageAlt:
+      "Front of men's Artwork Tee in peach with white and brown dots forming an isometric cube.",
+    price: "$35",
+    color: "Iso Dots",
+  },
+   {
+    id: 5,
+    name: "Vases & bowls",
+    href: "#",
+    imageSrc:
+      "http://t0.gstatic.com/images?q=tbn:ANd9GcRbg5LOGjLmga7fxQgO1Kaaj9abGHLqsw_68daPeid3Q9JC7wbT",
+    imageAlt:
+      "Front of men's Artwork Tee in peach with white and brown dots forming an isometric cube.",
+    price: "$35",
+    color: "Iso Dots",
+  },
+   {
+    id: 6,
+    name: "Photo frames",
+    href: "#",
+    imageSrc:
+      "http://t3.gstatic.com/images?q=tbn:ANd9GcQd98335BLQhOwB5y44QGCJGGhbhFbK2dS8CsYmaEonKwFWwZOf",
     imageAlt:
       "Front of men's Artwork Tee in peach with white and brown dots forming an isometric cube.",
     price: "$35",
@@ -43,7 +66,7 @@ const products = [
   },
 ];
 
-export default function TeesProduct() {
+export default function SelfImprovementPage() {
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
@@ -77,6 +100,7 @@ export default function TeesProduct() {
             </div>
           ))}
         </div>
+         <Link to="/" className="text-blue-600 underline">← Back to Categories</Link>
       </div>
     </div>
   );

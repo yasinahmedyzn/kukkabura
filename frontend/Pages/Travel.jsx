@@ -2,40 +2,40 @@ import { Link } from "react-router-dom";
 const products = [
   {
     id: 1,
-    name: "Basic Tee",
+    name: "Travel Adapter",
     href: "#",
     imageSrc:
-      "https://tailwindcss.com/plus-assets/img/ecommerce-images/product-page-01-related-product-01.jpg",
+      "https://images.squarespace-cdn.com/content/v1/5936d5865016e1ef18350db7/9ec24d3c-7e9b-4abc-af01-c6e1b616f4dd/coffee-cup-japan-2023-9.jpg",
     imageAlt: "Front of men's Basic Tee in black.",
     price: "$35",
     color: "Black",
   },
   {
     id: 2,
-    name: "Basic Tee",
+    name: "Travelrest The Ultimate Travel Pillow",
     href: "#",
     imageSrc:
-      "https://tailwindcss.com/plus-assets/img/ecommerce-images/product-page-01-related-product-02.jpg",
+      "https://m.media-amazon.com/images/I/811s2pez50L.jpg",
     imageAlt: "Front of men's Basic Tee in white.",
     price: "$35",
     color: "Aspen White",
   },
   {
     id: 3,
-    name: "Basic Tee",
+    name: "Packing cubes",
     href: "#",
     imageSrc:
-      "https://tailwindcss.com/plus-assets/img/ecommerce-images/product-page-01-related-product-03.jpg",
+      "https://www.travelsentry.org/wp-content/uploads/2022/12/TS_PackingCubes_Feature-345x320.jpg",
     imageAlt: "Front of men's Basic Tee in dark gray.",
     price: "$35",
     color: "Charcoal",
   },
   {
     id: 4,
-    name: "Artwork Tee",
+    name: "Reusable toiletry bottles",
     href: "#",
     imageSrc:
-      "https://tailwindcss.com/plus-assets/img/ecommerce-images/product-page-01-related-product-04.jpg",
+      "https://shakirscollection.com/wp-content/uploads/2024/05/threeb1-600x600.jpg",
     imageAlt:
       "Front of men's Artwork Tee in peach with white and brown dots forming an isometric cube.",
     price: "$35",
@@ -43,7 +43,7 @@ const products = [
   },
 ];
 
-export default function TeesProduct() {
+export default function TravelPage() {
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
@@ -77,6 +77,7 @@ export default function TeesProduct() {
             </div>
           ))}
         </div>
+         <Link to="/" className="text-blue-600 underline">← Back to Categories</Link>
       </div>
     </div>
   );

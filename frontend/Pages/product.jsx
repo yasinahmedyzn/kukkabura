@@ -1,9 +1,8 @@
-import React from 'react'
-import Example from '../Product/Product'
+import TeesProduct from '../Product/Product'
 
 function product() {
   return (
- <Example />
+ <TeesProduct />
   )
 }
 
