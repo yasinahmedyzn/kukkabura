@@ -56,9 +56,7 @@ const Navbar = () => {
 
               {/* Dropdown */}
               {showDropdown && (
-                <div
-                  className="absolute top-16 left-0 z-50 w-64 max-h-[400px] overflow-y-auto rounded-md bg-white shadow-xl border border-gray-200 transition-all"
-                >
+                <div className="absolute top-16 left-0 z-50 w-64 max-h-[400px] overflow-y-auto rounded-md bg-white shadow-xl border border-gray-200 transition-all">
                   <ul className="text-sm text-gray-800 font-medium">
                     {[
                       "Accessories",
@@ -116,9 +114,11 @@ const Navbar = () => {
 
           {/* Icons */}
           <div className="flex items-center gap-6 text-gray-700 text-sm">
-            <button className="hover:underline" type="button">
-              Sign in
-            </button>
+            <Link to="/login">
+              <button className="hover:underline" type="button">
+                Sign in
+              </button>
+            </Link>
             <FaHeart className="cursor-pointer" />
             <FaGift className="cursor-pointer" />
             <FaShoppingCart className="cursor-pointer" />
