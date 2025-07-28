@@ -9,6 +9,7 @@ import SelfImprovementPage from "../Pages/selfimprovement";
 import TravelPage from "../Pages/Travel";
 import Login from "../Auth/loginForm";
 import Registration from "../Auth/RegistrationForm";
+import Success from "../Auth/success";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/Travel" element={<TravelPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/Registration" element={<Registration />} />
+          <Route path="/success" element={<Success />} />
         </Routes>
       </Router>
     </>
