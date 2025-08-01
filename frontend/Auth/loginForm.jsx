@@ -18,17 +18,25 @@ const Login = () => {
         password,
       });
 
-      setMessage(res.data.message); // "This is sign in page"
+      setMessage(res.data.message || "Login successful");
+
+      // Extract role from response
+      const userRole = res.data.user?.role;
 
       if (res.status === 200) {
+        // Optional: Save user role or id to localStorage if needed
+        // localStorage.setItem("user", JSON.stringify(res.data.user));
+
         setTimeout(() => {
-          navigate("/success");
+          if (userRole === "admin") {
+            navigate("/admin-dashboard");
+          } else {
+            navigate("/success");
+          }
         }, 1000);
       }
     } catch (error) {
-      setMessage(
-        error.response?.data?.message || "Login failed: Server error"
-      );
+      setMessage(error.response?.data?.message || "Login failed: Server error");
     }
   };
 
@@ -86,7 +94,7 @@ const Login = () => {
           </div>
         </form>
 
-        {/* Message display */}
+        {/* Show login message */}
         {message && (
           <p className="mt-4 text-center text-indigo-700 font-medium">{message}</p>
         )}

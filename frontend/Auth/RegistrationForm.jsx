@@ -16,13 +16,13 @@ export default function Registration() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Automatically set role in the request logic (backend enforces it too)
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/register",
-        form
-      );
-      alert(res.data.message); // show success message
-      // Optionally, redirect to login page or clear form
+      const res = await axios.post("http://localhost:5000/api/auth/register", form);
+      alert(res.data.message);
+      // Optionally redirect to login page after successful registration
+      // navigate("/login");
     } catch (error) {
       alert(error.response?.data?.message || "Something went wrong!");
     }
@@ -31,7 +31,7 @@ export default function Registration() {
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+        <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
           Create your account
         </h2>
       </div>
@@ -40,10 +40,7 @@ export default function Registration() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="flex gap-4">
             <div className="w-1/2">
-              <label
-                htmlFor="firstName"
-                className="block text-sm font-medium text-gray-900"
-              >
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-900">
                 First Name
               </label>
               <div className="mt-2">
@@ -60,10 +57,7 @@ export default function Registration() {
             </div>
 
             <div className="w-1/2">
-              <label
-                htmlFor="lastName"
-                className="block text-sm font-medium text-gray-900"
-              >
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-900">
                 Last Name
               </label>
               <div className="mt-2">
@@ -81,10 +75,7 @@ export default function Registration() {
           </div>
 
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-900"
-            >
+            <label htmlFor="email" className="block text-sm font-medium text-gray-900">
               Email address
             </label>
             <div className="mt-2">
@@ -101,10 +92,7 @@ export default function Registration() {
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-900"
-            >
+            <label htmlFor="password" className="block text-sm font-medium text-gray-900">
               Password
             </label>
             <div className="mt-2">
@@ -132,10 +120,7 @@ export default function Registration() {
 
         <p className="mt-10 text-center text-sm text-gray-500">
           Already have an account?{" "}
-          <Link
-            to="/login"
-            className="font-semibold text-indigo-600 hover:text-indigo-500"
-          >
+          <Link to="/login" className="font-semibold text-indigo-600 hover:text-indigo-500">
             Sign in
           </Link>
         </p>

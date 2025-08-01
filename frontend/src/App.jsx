@@ -10,6 +10,7 @@ import TravelPage from "../Pages/Travel";
 import Login from "../Auth/loginForm";
 import Registration from "../Auth/RegistrationForm";
 import Success from "../Auth/success";
+import Admin_dashboard from "../Auth/admindashboard";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/Registration" element={<Registration />} />
           <Route path="/success" element={<Success />} />
+          <Route path="/admin-dashboard" element = {<Admin_dashboard />} />
         </Routes>
       </Router>
     </>

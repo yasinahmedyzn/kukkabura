@@ -11,11 +11,15 @@ exports.registerUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // 👇 Assign role based on email
+    const role = email === "mdyasinahmed@gmail.com" ? "admin" : "user";
+
     const user = new User({
       firstName,
       lastName,
       email,
       password: hashedPassword,
+      role, // 👈 include the role here
     });
 
     await user.save();
@@ -26,25 +30,30 @@ exports.registerUser = async (req, res) => {
   }
 };
 
+
 // 👇 Add this login function
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Check if user exists
     const user = await User.findOne({ email });
     if (!user)
       return res.status(400).json({ message: "User not found" });
 
-    // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
       return res.status(400).json({ message: "Invalid password" });
 
-    // Success
-    res.status(200).json({ message: "This is sign in page" });
+    // 👇 Send role back
+    res.status(200).json({
+      message: "Login successful",
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role, // 👈 send role
+      },
+    });
   } catch (err) {
-    console.error("Login error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
