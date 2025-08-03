@@ -20,7 +20,6 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/product" element={<Example />} />
-
           <Route path="/Desk" element={<DeskPage />} />
           <Route path="/Self" element={<SelfImprovementPage />} />
           <Route path="/Travel" element={<TravelPage />} />
