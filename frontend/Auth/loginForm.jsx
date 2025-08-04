@@ -1,12 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../src/context/AuthContext";
+
 
 const Login = () => {
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -18,27 +22,24 @@ const Login = () => {
         password,
       });
 
-      setMessage(res.data.message || "Login successful");
+    const userData = res.data.user;
+    const jwtToken = res.data.token;
 
-      // Extract role from response
-      const userRole = res.data.user?.role;
+    login(userData, jwtToken); // ✅ Set in context
 
-      if (res.status === 200) {
-        // Optional: Save user role or id to localStorage if needed
-        // localStorage.setItem("user", JSON.stringify(res.data.user));
+    setMessage(res.data.message || "Login successful");
 
-        setTimeout(() => {
-          if (userRole === "admin") {
-            navigate("/admin-dashboard");
-          } else {
-            navigate("/success");
-          }
-        }, 1000);
+    setTimeout(() => {
+      if (userData.role === "admin") {
+        navigate("/admin-dashboard");
+      } else {
+        navigate("/success");
       }
-    } catch (error) {
-      setMessage(error.response?.data?.message || "Login failed: Server error");
-    }
-  };
+    }, 1000);
+  } catch (error) {
+    setMessage(error.response?.data?.message || "Login failed: Server error");
+  }
+};
 
   return (
     <div className="flex min-h-screen flex-col justify-center px-6 py-12 bg-gray-50">
@@ -94,7 +95,6 @@ const Login = () => {
           </div>
         </form>
 
-        {/* Show login message */}
         {message && (
           <p className="mt-4 text-center text-indigo-700 font-medium">{message}</p>
         )}
