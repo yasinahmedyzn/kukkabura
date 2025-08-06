@@ -14,19 +14,27 @@ export default function Registration() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    // Automatically set role in the request logic (backend enforces it too)
-    try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", form);
-      alert(res.data.message);
-      // Optionally redirect to login page after successful registration
-      // navigate("/login");
-    } catch (error) {
-      alert(error.response?.data?.message || "Something went wrong!");
-    }
-  };
+  try {
+    const res = await axios.post("http://localhost:5000/api/auth/register", form);
+    alert(res.data.message);
+
+    // Clear form data
+    setForm({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+    });
+
+    // Optionally redirect after successful registration
+    // navigate("/login");
+  } catch (error) {
+    alert(error.response?.data?.message || "Something went wrong!");
+  }
+};
 
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
