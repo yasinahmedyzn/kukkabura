@@ -25,6 +25,10 @@ const Login = () => {
     const userData = res.data.user;
     const jwtToken = res.data.token;
 
+     // ✅ Save to localStorage
+    localStorage.setItem("token", jwtToken);
+    localStorage.setItem("user", JSON.stringify(userData));
+
     login(userData, jwtToken); // ✅ Set in context
 
     setMessage(res.data.message || "Login successful");

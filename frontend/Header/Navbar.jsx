@@ -18,10 +18,9 @@ const Navbar = () => {
   const profileRef = useRef(null);
   const navigate = useNavigate();
 
-  // Use user and logout from AuthContext (no local user state here!)
   const { user, logout } = useContext(AuthContext);
 
-  // Hide dropdowns on outside click
+  // Close dropdowns on click outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -31,12 +30,18 @@ const Navbar = () => {
         setShowProfileDropdown(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Reset profile dropdown whenever user changes (login/logout)
+  useEffect(() => {
+    setShowProfileDropdown(false);
+  }, [user]);
+
   const handleLogout = () => {
-    logout();      // Call logout from context, which clears storage and context state
+    logout();
     navigate("/login");
   };
 
@@ -125,6 +130,7 @@ const Navbar = () => {
                 <button
                   className="flex items-center gap-2 text-sm font-medium"
                   onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                  type="button"
                 >
                   <FaUserCircle className="text-lg" />
                   {user.firstName || "Profile"}
@@ -135,12 +141,33 @@ const Navbar = () => {
                     <Link
                       to="/profile"
                       className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      onClick={() => setShowProfileDropdown(false)}
                     >
                       Profile
                     </Link>
+
+                    {user.role === "admin" ? (
+                      <Link
+                        to="/admin-dashboard"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        onClick={() => setShowProfileDropdown(false)}
+                      >
+                        Dashboard
+                      </Link>
+                    ) : (
+                      <Link
+                        to="/my-orders"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        onClick={() => setShowProfileDropdown(false)}
+                      >
+                        My Orders
+                      </Link>
+                    )}
+
                     <button
                       onClick={handleLogout}
                       className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
+                      type="button"
                     >
                       Logout
                     </button>
