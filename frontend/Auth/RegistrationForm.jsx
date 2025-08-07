@@ -14,27 +14,30 @@ export default function Registration() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
-    const res = await axios.post("http://localhost:5000/api/auth/register", form);
-    alert(res.data.message);
+    try {
+      const res = await axios.post(
+        "hhttps://kukkabura-backend.onrender.com/api/auth/register",
+        form
+      );
+      alert(res.data.message);
 
-    // Clear form data
-    setForm({
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-    });
+      // Clear form data
+      setForm({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+      });
 
-    // Optionally redirect after successful registration
-    // navigate("/login");
-  } catch (error) {
-    alert(error.response?.data?.message || "Something went wrong!");
-  }
-};
+      // Optionally redirect after successful registration
+      // navigate("/login");
+    } catch (error) {
+      alert(error.response?.data?.message || "Something went wrong!");
+    }
+  };
 
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
@@ -48,7 +51,10 @@ export default function Registration() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="flex gap-4">
             <div className="w-1/2">
-              <label htmlFor="firstName" className="block text-sm font-medium text-gray-900">
+              <label
+                htmlFor="firstName"
+                className="block text-sm font-medium text-gray-900"
+              >
                 First Name
               </label>
               <div className="mt-2">
@@ -65,7 +71,10 @@ export default function Registration() {
             </div>
 
             <div className="w-1/2">
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-900">
+              <label
+                htmlFor="lastName"
+                className="block text-sm font-medium text-gray-900"
+              >
                 Last Name
               </label>
               <div className="mt-2">
@@ -83,7 +92,10 @@ export default function Registration() {
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-900">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-900"
+            >
               Email address
             </label>
             <div className="mt-2">
@@ -100,7 +112,10 @@ export default function Registration() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-900">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-900"
+            >
               Password
             </label>
             <div className="mt-2">
@@ -128,7 +143,10 @@ export default function Registration() {
 
         <p className="mt-10 text-center text-sm text-gray-500">
           Already have an account?{" "}
-          <Link to="/login" className="font-semibold text-indigo-600 hover:text-indigo-500">
+          <Link
+            to="/login"
+            className="font-semibold text-indigo-600 hover:text-indigo-500"
+          >
             Sign in
           </Link>
         </p>

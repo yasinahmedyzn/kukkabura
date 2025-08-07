@@ -3,9 +3,7 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../src/context/AuthContext";
 
-
 const Login = () => {
-  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -17,33 +15,36 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
-        email,
-        password,
-      });
+      const res = await axios.post(
+        "https://kukkabura-backend.onrender.com/api/auth/login",
+        {
+          email,
+          password,
+        }
+      );
 
-    const userData = res.data.user;
-    const jwtToken = res.data.token;
+      const userData = res.data.user;
+      const jwtToken = res.data.token;
 
-     // ✅ Save to localStorage
-    localStorage.setItem("token", jwtToken);
-    localStorage.setItem("user", JSON.stringify(userData));
+      // ✅ Save to localStorage
+      localStorage.setItem("token", jwtToken);
+      localStorage.setItem("user", JSON.stringify(userData));
 
-    login(userData, jwtToken); // ✅ Set in context
+      login(userData, jwtToken); // ✅ Set in context
 
-    setMessage(res.data.message || "Login successful");
+      setMessage(res.data.message || "Login successful");
 
-    setTimeout(() => {
-      if (userData.role === "admin") {
-        navigate("/admin-dashboard");
-      } else {
-        navigate("/success");
-      }
-    }, 1000);
-  } catch (error) {
-    setMessage(error.response?.data?.message || "Login failed: Server error");
-  }
-};
+      setTimeout(() => {
+        if (userData.role === "admin") {
+          navigate("/admin-dashboard");
+        } else {
+          navigate("/success");
+        }
+      }, 1000);
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Login failed: Server error");
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col justify-center px-6 py-12 bg-gray-50">
@@ -56,7 +57,10 @@ const Login = () => {
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
               Email address
             </label>
             <div className="mt-2">
@@ -73,7 +77,10 @@ const Login = () => {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
               Password
             </label>
             <div className="mt-2">
@@ -100,12 +107,17 @@ const Login = () => {
         </form>
 
         {message && (
-          <p className="mt-4 text-center text-indigo-700 font-medium">{message}</p>
+          <p className="mt-4 text-center text-indigo-700 font-medium">
+            {message}
+          </p>
         )}
 
         <p className="mt-10 text-center text-sm text-gray-500">
           Not a member?{" "}
-          <Link to="/registration" className="font-semibold text-indigo-600 hover:text-indigo-500">
+          <Link
+            to="/registration"
+            className="font-semibold text-indigo-600 hover:text-indigo-500"
+          >
             Register now
           </Link>
         </p>

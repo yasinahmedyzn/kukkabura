@@ -14,7 +14,9 @@ export default function Carousel() {
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/carousel-images");
+        const res = await axios.get(
+          "https://kukkabura-backend.onrender.com/api/carousel-images"
+        );
         if (res.data && res.data.length > 0) {
           setImages(res.data);
         } else {
