@@ -3,13 +3,22 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 
-
 dotenv.config();
 const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://kukkabura-frontend.onrender.com",
+];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
 
 // Connect to DB
 connectDB();
