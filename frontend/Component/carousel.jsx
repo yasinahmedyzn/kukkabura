@@ -15,7 +15,7 @@ export default function Carousel() {
     const fetchImages = async () => {
       try {
         const res = await axios.get(
-          "https://kukkabura-backend.onrender.com/api/carousel-images"
+          `${import.meta.env.VITE_API_URL}/api/carousel-images`
         );
         if (res.data && res.data.length > 0) {
           setImages(res.data);

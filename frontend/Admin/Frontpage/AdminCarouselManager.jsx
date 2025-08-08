@@ -12,7 +12,7 @@ export default function AdminCarouselDashboard() {
   const fetchImages = async () => {
     try {
       const res = await axios.get(
-        "https://kukkabura-backend.onrender.com/api/carousel-images/all"
+        `${import.meta.env.VITE_API_URL}/api/carousel-images/all`
       );
       setImages(res.data);
     } catch (err) {
@@ -37,7 +37,7 @@ export default function AdminCarouselDashboard() {
     try {
       setUploading(true);
       const res = await axios.post(
-        "https://kukkabura-backend.onrender.com/api/carousel-images",
+        `${import.meta.env.VITE_API_URL}/api/carousel-images`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -61,7 +61,7 @@ export default function AdminCarouselDashboard() {
     setDeletingId(id);
     try {
       await axios.delete(
-        `https://kukkabura-backend.onrender.com/api/carousel-images/${id}`
+        `${import.meta.env.VITE_API_URL}/api/carousel-images/${id}`
       );
       setImages(images.filter((img) => img._id !== id));
     } catch (err) {
