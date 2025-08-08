@@ -19,7 +19,7 @@ export default function Registration() {
 
     try {
       const res = await axios.post(
-        "hhttps://kukkabura-backend.onrender.com/api/auth/register",
+        `${import.meta.env.VITE_API_URL}/api/auth/register`,
         form
       );
       alert(res.data.message);
