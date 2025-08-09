@@ -69,7 +69,7 @@ export default function DiscountedProduct() {
     <div className="w-full max-w-7xl mx-auto px-4 py-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl md:text-2xl font-semibold text-gray-900">Herlan Up To 60% Off</h2>
+        <h2 className="text-xl md:text-2xl font-semibold text-gray-900">Up To 60% Off</h2>
         <button className="text-sm text-gray-600 hover:text-gray-900 underline">View all</button>
       </div>
 

@@ -1,209 +1,207 @@
-"use client";
+"use client"
 
-import { useState } from "react";
+import { useState, useRef } from "react"
+import { Heart, ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react"
+import './styles.css';
 
 const products = [
   {
     id: 1,
-    name: "TRN MT1 Pro Professional Hi-Fi Dynamic Earphones",
-    price: "৳850.00",
-    image:
-      "https://gadgetmonkeybd.com/public/uploads/all/r3INpJY8U48uAMyLjZf3rBxH14u0sYaYk4G0jB61.webp",
+    brand: "Herlan",
+    name: "Galactic Glam Lip Gloss – Meteor Magic",
+    originalPrice: 1350,
+    image: "https://herlan.com/wp-content/uploads/2024/10/1-Galactic-Glam-Lip-Gloss-Supernova-Sizzle-800x800.webp",
+    hoverImage: "https://herlan.com/wp-content/uploads/2024/10/Lipgloss__Swatch_Solo_Sizzle.webp",
   },
   {
     id: 2,
-    name: "Apple Airpods Pro (2nd Generation) ANC Dubai Copy",
-    price: "৳1,699.00",
-    image:
-      "https://gadgetmonkeybd.com/public/uploads/all/deOMuVh8IUVR12DCxOmYlZqiIv8Ph62I1LjyUI9Z.jpg",
+    brand: "Herlan",
+    name: "Herlan Cushion Matte Lipstick Flaming Hot",
+    originalPrice: 1550,
+    image: "https://herlan.com/wp-content/uploads/2023/10/Herlan-Nail-Enamel-Front-Bridesmaid-990x990-1-800x800.png",
+    hoverImage: "https://herlan.com/wp-content/uploads/2024/03/Brides-Maid-800x800.jpg",
   },
   {
     id: 3,
-    name: "QCY ArcBuds HT07 ANC TWS Earbuds",
-    price: "৳2,200.00",
-    image:
-      "https://gadgetmonkeybd.com/public/uploads/all/40uOQ35yyJifXQqrGCC8ZILA3Ue2P1TzmbZ0k6Ss.jpg",
+    brand: "Herlan",
+    name: "Herlan Cushion Matte Lipstick Disco Diva",
+    originalPrice: 1550,
+    image: "https://herlan.com/wp-content/uploads/2023/10/Rosaline-1-800x800.jpg",
+    hoverImage: "https://herlan.com/wp-content/uploads/2024/03/Roseline-2.jpg",
   },
   {
     id: 4,
-    name: "Moondrop Chu 2 Dynamic Driver In-Ear Headphone",
-    price: "৳2,100.00",
-    image:
-      "https://gadgetmonkeybd.com/public/uploads/all/wdrxVGHLEfq1xOitNRPgJksYOj8EDwQmO04W94WV.jpg",
+    brand: "Herlan",
+    name: "Galactic Glam Holographic Lip Gloss – Galaxy Glitz",
+    originalPrice: 1350,
+    image: "https://herlan.com/wp-content/uploads/2023/12/1-Herlan-Cushion-Matte-Lipstick-Roaring-Twenties-800x800.webp",
+    hoverImage: "https://herlan.com/wp-content/uploads/2023/12/2-Herlan-Cushion-Matte-Lipstick-Roaring-Twenties.webp",
   },
   {
     id: 5,
-    name: "KBEAR 4 core silver plated copper cable with mic",
-    price: "৳699.00",
-    image:
-      "https://gadgetmonkeybd.com/public/uploads/all/KuoRwWCaSVHdefeSClQY9eLRVjsVieSTy4Igcw54.jpg",
+    brand: "Herlan",
+    name: "Herlan Cushion Matte Lipstick Retrograde Blue",
+    originalPrice: 1550,
+    image: "https://herlan.com/wp-content/uploads/2023/12/1-Herlan-Cushion-Matte-Lipstick-Retrograde-Blue-800x800.webp",
+    hoverImage: "https://herlan.com/wp-content/uploads/2023/12/2-Herlan-Cushion-Matte-Lipstick-Retrograde-Blue.webp",
   },
-];
-
-const ChevronLeft = () => (
-  <svg
-    className="w-5 h-5 text-gray-600"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M15 19l-7-7 7-7"
-    />
-  </svg>
-);
-
-const ChevronRight = () => (
-  <svg
-    className="w-5 h-5 text-gray-600"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M9 5l7 7-7 7"
-    />
-  </svg>
-);
-
-// Custom Button Component
-const Button = ({
-  children,
-  className = "",
-  variant = "default",
-  ...props
-}) => {
-  const baseClasses =
-    "px-4 py-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2";
-  const variantClasses = {
-    default: "bg-green-600 hover:bg-green-700 text-white focus:ring-green-500",
-    outline:
-      "border border-gray-300 text-gray-700 hover:bg-gray-50 bg-white focus:ring-gray-500",
-  };
-
-  return (
-    <button
-      className={`${baseClasses} ${variantClasses[variant]} ${className}`}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-};
+  {
+    id: 6,
+    brand: "Herlan",
+    name: "Herlan Cushion Matte Lipstick Retrograde Blue",
+    originalPrice: 1550,
+    image: "https://herlan.com/wp-content/uploads/2023/12/1-Herlan-Cushion-Matte-Lipstick-Retrograde-Blue-800x800.webp",
+    hoverImage: "https://herlan.com/wp-content/uploads/2023/12/2-Herlan-Cushion-Matte-Lipstick-Retrograde-Blue.webp",
+  },
+  {
+    id: 7,
+    brand: "Herlan",
+    name: "Herlan Cushion Matte Lipstick Retrograde Blue",
+    originalPrice: 1550,
+    image: "https://herlan.com/wp-content/uploads/2023/12/1-Herlan-Cushion-Matte-Lipstick-Retrograde-Blue-800x800.webp",
+    hoverImage: "https://herlan.com/wp-content/uploads/2023/12/2-Herlan-Cushion-Matte-Lipstick-Retrograde-Blue.webp",
+  },
+  {
+    id: 8,
+    brand: "Herlan",
+    name: "Herlan Cushion Matte Lipstick Retrograde Blue",
+    originalPrice: 1550,
+    image: "https://herlan.com/wp-content/uploads/2023/12/1-Herlan-Cushion-Matte-Lipstick-Retrograde-Blue-800x800.webp",
+    hoverImage: "https://herlan.com/wp-content/uploads/2023/12/2-Herlan-Cushion-Matte-Lipstick-Retrograde-Blue.webp",
+  },
+]
 
 export default function Newarrival() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const itemsPerView = 4; // Number of items visible at once on desktop
-  const maxIndex = Math.max(0, products.length - itemsPerView);
+  const [hoveredProduct, setHoveredProduct] = useState(null)
+  const [favorites, setFavorites] = useState(new Set())
+  const scrollContainerRef = useRef(null)
 
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex >= maxIndex ? 0 : prevIndex + 1));
-  };
+  const productsPerPageDesktop = 5
+  const productsPerPageMobile = 2
 
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex <= 0 ? maxIndex : prevIndex - 1));
-  };
+  // Scroll container by page on arrow click
+  const scrollByPage = (direction) => {
+    const container = scrollContainerRef.current
+    if (!container) return
+
+    const isMobile = window.innerWidth < 768
+    const productsPerPage = isMobile ? productsPerPageMobile : productsPerPageDesktop
+    const productWidth = container.clientWidth / productsPerPage
+    const scrollAmount = productWidth * productsPerPage * direction // direction: +1 or -1
+
+    container.scrollBy({ left: scrollAmount, behavior: "smooth" })
+  }
+
+  const toggleFavorite = (productId) => {
+    const newFavorites = new Set(favorites)
+    if (newFavorites.has(productId)) {
+      newFavorites.delete(productId)
+    } else {
+      newFavorites.add(productId)
+    }
+    setFavorites(newFavorites)
+  }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-8">
+    <div className="w-full max-w-7xl mx-auto px-4 py-6 relative">
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <div className="text-center flex-1">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-            New Arrival Product
-          </h2>
-          <p className="text-green-600 font-medium">
-            This products listed by this month
-          </p>
-        </div>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl md:text-2xl font-semibold text-gray-900">New Arrival Products</h2>
+        <button className="text-sm text-gray-600 hover:text-gray-900 underline">View all</button>
       </div>
 
-      {/* Product Carousel */}
-      <div className="relative">
-        {/* Navigation Arrows */}
-        <button
-          onClick={prevSlide}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-gray-50 transition-colors"
-        >
-          <ChevronLeft />
-        </button>
+      {/* Left Arrow */}
+      <button
+        onClick={() => scrollByPage(-1)}
+        aria-label="Scroll left"
+        className="hidden md:flex absolute top-1/2 left-2 -translate-y-1/2 z-20 bg-white border border-gray-300 rounded-full p-2 shadow hover:bg-gray-100"
+      >
+        <ChevronLeft className="w-5 h-5 text-gray-700" />
+      </button>
 
-        <button
-          onClick={nextSlide}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-gray-50 transition-colors"
-        >
-          <ChevronRight />
-        </button>
+      {/* Right Arrow */}
+      <button
+        onClick={() => scrollByPage(1)}
+        aria-label="Scroll right"
+        className="hidden md:flex absolute top-1/2 right-2 -translate-y-1/2 z-20 bg-white border border-gray-300 rounded-full p-2 shadow hover:bg-gray-100"
+      >
+        <ChevronRight className="w-5 h-5 text-gray-700" />
+      </button>
 
-        {/* Products Grid */}
-        <div className="overflow-hidden mx-8">
-          <div
-            className="flex transition-transform duration-300 ease-in-out gap-6"
-            style={{
-              transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
-              width: `${(products.length / itemsPerView) * 100}%`,
-            }}
-          >
-            {products.map((product) => (
-              <div
-                key={product.id}
-                className="flex-none bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer"
-                style={{ width: `${100 / products.length}%` }}
-              >
-                {/* Product Image */}
-                <div className="aspect-square bg-gray-50 p-4 transition-transform duration-300">
-                  <img
-                    src={product.image || "/placeholder.svg"}
-                    alt={product.name}
-                    className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
-                  />
-                </div>
-
-                {/* Product Info */}
-                <div className="p-4">
-                  <h3 className="text-sm font-medium text-gray-900 mb-3 line-clamp-2 min-h-[2.5rem]">
-                    {product.name}
-                  </h3>
-
-                  <div className="text-lg font-bold text-green-600 mb-4">
-                    {product.price}
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-2">
-                    <Button className="flex-1 text-sm py-2">Buy Now</Button>
-                    <Button
-                      variant="outline"
-                      className="flex-1 text-sm py-2 bg-transparent"
-                    >
-                      Add to Cart
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* Products Container */}
+      <div
+        ref={scrollContainerRef}
+        className="overflow-x-auto scroll-smooth hide-scrollbar"
+      >
+        <div className="flex gap-4">
+          {products.map((product) => (
+            <div key={product.id} className="flex-shrink-0 w-1/2 md:w-[20%]">
+              <ProductCard
+                product={product}
+                isHovered={hoveredProduct === product.id}
+                isFavorite={favorites.has(product.id)}
+                onHover={() => setHoveredProduct(product.id)}
+                onLeave={() => setHoveredProduct(null)}
+                onToggleFavorite={() => toggleFavorite(product.id)}
+              />
+            </div>
+          ))}
         </div>
-      </div>
-
-      {/* Mobile Scroll Indicator */}
-      <div className="flex justify-center mt-6 gap-2 lg:hidden">
-        {Array.from({ length: maxIndex + 1 }).map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentIndex(index)}
-            className={`w-2 h-2 rounded-full transition-colors ${
-              currentIndex === index ? "bg-green-600" : "bg-gray-300"
-            }`}
-          />
-        ))}
       </div>
     </div>
-  );
+  )
+}
+
+function ProductCard({ product, isHovered, isFavorite, onHover, onLeave, onToggleFavorite }) {
+  return (
+    <div className="bg-white rounded-lg border border-gray-100 p-3 md:p-4 relative group hover:shadow-md transition-shadow duration-200 cursor-pointer">
+      {/* Wishlist Heart */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          onToggleFavorite()
+        }}
+        className="absolute top-2 right-2 z-10 p-1 rounded-full hover:bg-gray-100 transition-colors"
+      >
+        <Heart
+          className={`w-4 h-4 ${isFavorite ? "fill-red-500 text-red-500" : "text-gray-400 hover:text-red-500"}`}
+        />
+      </button>
+
+      {/* Product Image with Hover Effect */}
+      <div className="relative mb-3" onMouseEnter={onHover} onMouseLeave={onLeave}>
+        <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden relative">
+          <img
+            src={product.image || "/placeholder.svg"}
+            alt={product.name}
+            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${
+              isHovered ? "opacity-0" : "opacity-100"
+            }`}
+          />
+          <img
+            src={product.hoverImage || "/placeholder.svg"}
+            alt={`${product.name} - alternate view`}
+            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${
+              isHovered ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        </div>
+      </div>
+
+      {/* Product Info */}
+      <div className="space-y-1">
+        <p className="text-xs font-medium text-gray-900">{product.brand}</p>
+        <h3 className="text-xs md:text-sm text-gray-700 line-clamp-2 leading-tight">{product.name}</h3>
+
+        <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center space-x-2">
+            <span className="text-sm font-semibold text-red-600">₹ {product.originalPrice}</span>
+          </div>
+          <button className="p-1.5 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors">
+            <ShoppingCart className="w-3 h-3" />
+          </button>
+        </div>
+      </div>
+    </div>
+  )
 }
