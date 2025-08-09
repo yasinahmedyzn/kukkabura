@@ -12,8 +12,7 @@ pipeline {
     // Frontend environment variables (from Jenkins, not .env file)
     // These must be set in Jenkins job configuration
     VITE_API_URL = 'https://kukkabura-backend.onrender.com'
-    # You can add more like:
-    # VITE_OTHER_KEY = 'some-value'
+    //add more .env
   }
 
   stages {
