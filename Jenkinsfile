@@ -2,9 +2,18 @@ pipeline {
   agent any
 
   environment {
+    // Docker Hub login
     DOCKERHUB_CREDENTIALS = credentials('docker-hub-creds')
+
+    // Image names
     FRONTEND_IMAGE = 'yasin2022/kukkabura:frontend'
     BACKEND_IMAGE = 'yasin2022/kukkabura:backend'
+
+    // Frontend environment variables (from Jenkins, not .env file)
+    // These must be set in Jenkins job configuration
+    VITE_API_URL = 'https://kukkabura-backend.onrender.com'
+    # You can add more like:
+    # VITE_OTHER_KEY = 'some-value'
   }
 
   stages {
@@ -16,7 +25,12 @@ pipeline {
 
     stage('Build Docker Images') {
       steps {
-        sh 'docker build -t $FRONTEND_IMAGE ./frontend'
+        // Pass VITE_* variables into frontend Docker build
+        sh """
+          docker build \
+            --build-arg VITE_API_URL=$VITE_API_URL \
+            -t $FRONTEND_IMAGE ./frontend
+        """
         sh 'docker build -t $BACKEND_IMAGE ./backend'
       }
     }
