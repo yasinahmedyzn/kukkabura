@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { AuthContext } from "../src/context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
+import { useCart } from "../src/context/CartContext"
 import {
   FaSearch,
   FaHeart,
@@ -12,6 +13,7 @@ import {
 import logo from "../Images/logo.svg";
 
 const Navbar = () => {
+  const { cartItems } = useCart();
   const [showDropdown, setShowDropdown] = useState(false); // categories (desktop & mobile)
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
@@ -231,7 +233,22 @@ const Navbar = () => {
 
             <FaHeart className="cursor-pointer" />
             <FaGift className="cursor-pointer" />
-            <FaShoppingCart className="cursor-pointer" />
+
+            {/*Add to cart code*/}
+            <div>
+              <nav className="flex items-center justify-between p-1 bg-white shadow">
+                {/* Other Navbar Content */}
+
+                <Link to="/cart" className="relative cursor-pointer">
+                  <FaShoppingCart className="text-base" />
+                  {cartItems.length > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[12px] font-bold px-1 rounded-full leading-none">
+                      {cartItems.length}
+                    </span>
+                  )}
+                </Link>
+              </nav>
+            </div>
           </div>
         </div>
 
@@ -346,7 +363,20 @@ const Navbar = () => {
             )}
 
             {/* Cart */}
-            {user && <FaShoppingCart size={16} />}
+            {user && <>  <div>
+              <nav className="flex items-center justify-between p-1 bg-white shadow">
+                {/* Other Navbar Content */}
+
+                <Link to="/cart" className="relative cursor-pointer">
+                  <FaShoppingCart className="text-base" />
+                  {cartItems.length > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[12px] font-bold px-1 rounded-full leading-none">
+                      {cartItems.length}
+                    </span>
+                  )}
+                </Link>
+              </nav>
+            </div></>}
           </div>
         </div>
 

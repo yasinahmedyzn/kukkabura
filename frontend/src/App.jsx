@@ -12,6 +12,7 @@ import Success from "../Auth/success";
 import Admin_dashboard from "../Auth/admindashboard";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import PrivateRoute from "./utils/PrivateRoute";
+import CartPage from "../Pages/CartPage.jsx";
 
 function App() {
   return (
@@ -27,7 +28,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/registration" element={<Registration />} />
           <Route path="/success" element={<Success />} />
-          <Route path="/admin-dashboard" element={<Admin_dashboard />}/>
+          <Route path="/admin-dashboard" element={<Admin_dashboard />} />
+          <Route path="/cart" element={<CartPage />} />
         </Routes>
       </Router>
     </AuthProvider>
