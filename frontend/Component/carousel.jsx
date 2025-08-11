@@ -12,7 +12,7 @@ export default function Carousel() {
   const [images, setImages] = useState(defaultImages);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Fetch images
+  // Fetch images from API
   useEffect(() => {
     const fetchImages = async () => {
       try {
@@ -29,7 +29,7 @@ export default function Carousel() {
     fetchImages();
   }, []);
 
-  // Auto-slide
+  // Auto-slide every 3 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prev) =>
@@ -39,7 +39,7 @@ export default function Carousel() {
     return () => clearInterval(interval);
   }, [images]);
 
-  // Swipe support
+  // Swipe support for mobile & desktop
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () =>
       setCurrentIndex((prev) =>
@@ -50,16 +50,13 @@ export default function Carousel() {
         prev === 0 ? images.length - 1 : prev - 1
       ),
     preventScrollOnSwipe: true,
-    trackMouse: true, // enables desktop swipe
+    trackMouse: true, // enables swipe with mouse on desktop
   });
 
   return (
     <div className="max-w-7xl mx-auto mt-8 rounded-2xl shadow-lg relative">
-      {/* Swipeable viewport */}
-      <div
-        {...swipeHandlers}
-        className="overflow-hidden select-none" // select-none prevents text/image selection
-      >
+      {/* Swipeable container */}
+      <div {...swipeHandlers} className="overflow-hidden select-none">
         <div
           className="flex transition-transform duration-700 ease-in-out"
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
@@ -69,22 +66,45 @@ export default function Carousel() {
               key={idx}
               src={src}
               alt={`Slide ${idx + 1}`}
-              draggable="false" // stops browser from dragging image
-              className="w-full flex-shrink-0 object-cover h-[400px] pointer-events-none"
+              draggable="false"
+              className={`
+                w-full flex-shrink-0 object-cover pointer-events-none
+                /* Mobile view height */
+                h-[180px]
+                /* Tablet view height */
+                sm:h-[250px]
+                /* Medium desktop height */
+                md:h-[350px]
+                /* Large desktop height */
+                lg:h-[400px]
+              `}
             />
           ))}
         </div>
       </div>
 
-      {/* Dots */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 backdrop-blur-md rounded-full px-4 py-2 flex space-x-3">
+      {/* Navigation Dots */}
+      <div
+        className={`
+          absolute left-1/2 transform -translate-x-1/2 backdrop-blur-md rounded-full flex
+          /* Mobile view positioning & size */
+          bottom-2 px-2 py-1 space-x-2
+          /* Desktop view positioning & size */
+          sm:bottom-4 sm:px-4 sm:py-2 sm:space-x-3
+        `}
+      >
         {images.map((_, idx) => (
           <button
             key={idx}
             onClick={() => setCurrentIndex(idx)}
-            className={`h-3 w-3 rounded-full transition-colors ${
-              idx === currentIndex ? "bg-blue-600" : "bg-gray-300"
-            }`}
+            className={`
+              rounded-full transition-colors
+              /* Mobile dot size */
+              h-2 w-2
+              /* Desktop dot size */
+              sm:h-3 sm:w-3
+              ${idx === currentIndex ? "bg-blue-600" : "bg-gray-300"}
+            `}
           />
         ))}
       </div>

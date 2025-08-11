@@ -106,7 +106,7 @@ export default function TopSellingProduct() {
     <div className="w-full max-w-7xl mx-auto px-4 py-6 relative">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl md:text-2xl font-semibold text-gray-900">Top Selling Products</h2>
+        <h2 className="text-base text-base sm:text-xl font-bold text-gray-800 mb-3">Top Selling Products</h2>
         <button className="text-sm text-gray-600 hover:text-gray-900 underline">View all</button>
       </div>
 
