@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 
+
 dotenv.config();
 const app = express();
 
@@ -31,8 +32,22 @@ app.use("/api/auth", authRoutes);
 const carouselRoutes = require("./routes/carouselImages");
 app.use("/api/carousel-images", carouselRoutes);
 
+//top product routes
+const topProductsRoutes = require("./routes/topProducts.js");
+app.use("/api/top-products", topProductsRoutes);
+
+//new product routes
+const newProductsRoutes = require("./routes/newProduct.js");
+app.use("/api/new-products", newProductsRoutes);
+
+//cart
+const cartRoutes = require("./routes/cart");
+app.use("/api/cart", cartRoutes);
+
 // Serve uploads statically
 app.use("/uploads", express.static("uploads"));
+
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

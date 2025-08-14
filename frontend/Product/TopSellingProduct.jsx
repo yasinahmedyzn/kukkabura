@@ -1,85 +1,35 @@
-"use client"
+"use client";
 
-import { useState, useRef } from "react"
-import { Heart, ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react"
-import './styles.css';
+import { useState, useRef, useEffect } from "react";
+import { Heart, ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
+import "./styles.css";
 import { useCart } from "../src/context/CartContext";
 
-const products = [
-  {
-    id: 1,
-    brand: "Herlan",
-    name: "Galactic Glam Lip Gloss – Meteor Magic",
-    price: 1350,
-    image: "https://herlan.com/wp-content/uploads/2024/10/1-Galactic-Glam-Lip-Gloss-Supernova-Sizzle-800x800.webp",
-    hoverImage: "https://herlan.com/wp-content/uploads/2024/10/Lipgloss__Swatch_Solo_Sizzle.webp",
-  },
-  {
-    id: 2,
-    brand: "Herlan",
-    name: "Herlan Cushion Matte Lipstick Flaming Hot",
-    price: 1550,
-    image: "https://herlan.com/wp-content/uploads/2023/10/Herlan-Nail-Enamel-Front-Bridesmaid-990x990-1-800x800.png",
-    hoverImage: "https://herlan.com/wp-content/uploads/2024/03/Brides-Maid-800x800.jpg",
-  },
-  {
-    id: 3,
-    brand: "Herlan",
-    name: "Herlan Cushion Matte Lipstick Disco Diva",
-    price: 1550,
-    image: "https://herlan.com/wp-content/uploads/2023/10/Rosaline-1-800x800.jpg",
-    hoverImage: "https://herlan.com/wp-content/uploads/2024/03/Roseline-2.jpg",
-  },
-  {
-    id: 4,
-    brand: "Herlan",
-    name: "Galactic Glam Holographic Lip Gloss – Galaxy Glitz",
-    price: 1350,
-    image: "https://herlan.com/wp-content/uploads/2023/12/1-Herlan-Cushion-Matte-Lipstick-Roaring-Twenties-800x800.webp",
-    hoverImage: "https://herlan.com/wp-content/uploads/2023/12/2-Herlan-Cushion-Matte-Lipstick-Roaring-Twenties.webp",
-  },
-  {
-    id: 5,
-    brand: "Herlan",
-    name: "Herlan Cushion Matte Lipstick Retrograde Blue",
-    price: 1550,
-    image: "https://herlan.com/wp-content/uploads/2023/12/1-Herlan-Cushion-Matte-Lipstick-Retrograde-Blue-800x800.webp",
-    hoverImage: "https://herlan.com/wp-content/uploads/2023/12/2-Herlan-Cushion-Matte-Lipstick-Retrograde-Blue.webp",
-  },
-  {
-    id: 6,
-    brand: "Herlan",
-    name: "Herlan Cushion Matte Lipstick Retrograde Blue",
-    price: 1550,
-    image: "https://herlan.com/wp-content/uploads/2023/12/1-Herlan-Cushion-Matte-Lipstick-Retrograde-Blue-800x800.webp",
-    hoverImage: "https://herlan.com/wp-content/uploads/2023/12/2-Herlan-Cushion-Matte-Lipstick-Retrograde-Blue.webp",
-  },
-  {
-    id: 7,
-    brand: "Herlan",
-    name: "Herlan Cushion Matte Lipstick Retrograde Blue",
-    price: 1550,
-    image: "https://herlan.com/wp-content/uploads/2023/12/1-Herlan-Cushion-Matte-Lipstick-Retrograde-Blue-800x800.webp",
-    hoverImage: "https://herlan.com/wp-content/uploads/2023/12/2-Herlan-Cushion-Matte-Lipstick-Retrograde-Blue.webp",
-  },
-  {
-    id: 8,
-    brand: "Herlan",
-    name: "Herlan Cushion Matte Lipstick Retrograde Blue",
-    price: 1550,
-    image: "https://herlan.com/wp-content/uploads/2023/12/1-Herlan-Cushion-Matte-Lipstick-Retrograde-Blue-800x800.webp",
-    hoverImage: "https://herlan.com/wp-content/uploads/2023/12/2-Herlan-Cushion-Matte-Lipstick-Retrograde-Blue.webp",
-  },
-]
-
 export default function TopSellingProduct() {
+  const [products, setProducts] = useState([]);
   const [hoveredProduct, setHoveredProduct] = useState(null);
   const [favorites, setFavorites] = useState(new Set());
   const scrollContainerRef = useRef(null);
-  const { addToCart } = useCart(); // ✅ Get addToCart from context
+
+  const { addToCart } = useCart();
 
   const productsPerPageDesktop = 5;
   const productsPerPageMobile = 2;
+
+  // ✅ Fetch products from backend
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/top-products`);
+        if (!res.ok) throw new Error("Failed to fetch products");
+        const data = await res.json();
+        setProducts(data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const scrollByPage = (direction) => {
     const container = scrollContainerRef.current;
@@ -109,13 +59,14 @@ export default function TopSellingProduct() {
     <div className="w-full max-w-7xl mx-auto px-4 py-6 relative">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-base sm:text-xl font-bold text-gray-800 mb-3">
-          New Arrival Products
+          Top Selling Product
         </h2>
         <button className="text-sm text-gray-600 hover:text-gray-900 underline">
           View all
         </button>
       </div>
 
+      {/* Scroll Buttons */}
       <button
         onClick={() => scrollByPage(-1)}
         aria-label="Scroll left"
@@ -132,21 +83,23 @@ export default function TopSellingProduct() {
         <ChevronRight className="w-5 h-5 text-gray-700" />
       </button>
 
+      {/* Product List */}
       <div
         ref={scrollContainerRef}
         className="overflow-x-auto scroll-smooth hide-scrollbar"
       >
         <div className="flex gap-4">
           {products.map((product) => (
-            <div key={product.id} className="flex-shrink-0 w-1/2 md:w-[20%]">
+            <div key={product._id} className="flex-shrink-0 w-1/2 md:w-[20%]">
               <ProductCard
                 product={product}
-                isHovered={hoveredProduct === product.id}
-                isFavorite={favorites.has(product.id)}
-                onHover={() => setHoveredProduct(product.id)}
+                isHovered={hoveredProduct === product._id}
+                isFavorite={favorites.has(product._id)}
+                onHover={() => setHoveredProduct(product._id)}
                 onLeave={() => setHoveredProduct(null)}
-                onToggleFavorite={() => toggleFavorite(product.id)}
-                onAddToCart={() => addToCart(product)} // ✅ Pass add to cart
+                onToggleFavorite={() => toggleFavorite(product._id)}
+                // ✅ Send only productId & quantity to backend
+                onAddToCart={() => addToCart(product._id, 1)}
               />
             </div>
           ))}
@@ -167,6 +120,7 @@ function ProductCard({
 }) {
   return (
     <div className="bg-white rounded-lg border border-gray-100 p-3 md:p-4 relative group hover:shadow-md transition-shadow duration-200 cursor-pointer">
+      {/* Favorite Button */}
       <button
         onClick={(e) => {
           e.stopPropagation();
@@ -175,30 +129,41 @@ function ProductCard({
         className="absolute top-2 right-2 z-10 p-1 rounded-full hover:bg-gray-100 transition-colors"
       >
         <Heart
-          className={`w-4 h-4 ${isFavorite
+          className={`w-4 h-4 ${
+            isFavorite
               ? "fill-red-500 text-red-500"
               : "text-gray-400 hover:text-red-500"
-            }`}
+          }`}
         />
       </button>
 
-      <div className="relative mb-3" onMouseEnter={onHover} onMouseLeave={onLeave}>
+      {/* Product Image */}
+      <div
+        className="relative mb-3"
+        onMouseEnter={onHover}
+        onMouseLeave={onLeave}
+      >
         <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden relative">
           <img
-            src={product.image}
+            src={product.imageUrl}
             alt={product.name}
-            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${isHovered ? "opacity-0" : "opacity-100"
-              }`}
+            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${
+              isHovered ? "opacity-0" : "opacity-100"
+            }`}
           />
-          <img
-            src={product.hoverImage}
-            alt={`${product.name} - alternate view`}
-            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-0"
+          {product.hoverImageUrl && (
+            <img
+              src={product.hoverImageUrl}
+              alt={`${product.name} - alternate view`}
+              className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${
+                isHovered ? "opacity-100" : "opacity-0"
               }`}
-          />
+            />
+          )}
         </div>
       </div>
 
+      {/* Product Info */}
       <div className="space-y-1">
         <p className="text-xs font-medium text-gray-900">{product.brand}</p>
         <h3 className="text-xs md:text-sm text-gray-700 line-clamp-2 leading-tight">
@@ -207,7 +172,7 @@ function ProductCard({
 
         <div className="flex items-center justify-between pt-2">
           <span className="text-sm font-semibold text-red-600">
-            ₹ {product.price}
+            ৳ {product.price}
           </span>
           <button
             onClick={(e) => {

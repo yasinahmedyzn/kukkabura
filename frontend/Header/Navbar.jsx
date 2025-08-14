@@ -13,7 +13,9 @@ import {
 import logo from "../Images/logo.svg";
 
 const Navbar = () => {
-  const { cartItems } = useCart();
+
+  const { clearCart, cartCount } = useCart();
+  
   const [showDropdown, setShowDropdown] = useState(false); // categories (desktop & mobile)
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
@@ -83,6 +85,7 @@ const Navbar = () => {
   const handleLogout = () => {
     logout();
     navigate("/login");
+    clearCart();
   };
 
   return (
@@ -241,9 +244,9 @@ const Navbar = () => {
 
                 <Link to="/cart" className="relative cursor-pointer">
                   <FaShoppingCart className="text-base" />
-                  {cartItems.length > 0 && (
+                  {cartCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[12px] font-bold px-1 rounded-full leading-none">
-                      {cartItems.length}
+                      {cartCount}
                     </span>
                   )}
                 </Link>
@@ -369,9 +372,9 @@ const Navbar = () => {
 
                 <Link to="/cart" className="relative cursor-pointer">
                   <FaShoppingCart className="text-base" />
-                  {cartItems.length > 0 && (
+                  {cartCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[12px] font-bold px-1 rounded-full leading-none">
-                      {cartItems.length}
+                      {cartCount}
                     </span>
                   )}
                 </Link>

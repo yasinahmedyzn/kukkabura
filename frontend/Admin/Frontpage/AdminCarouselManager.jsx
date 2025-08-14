@@ -36,12 +36,10 @@ export default function AdminCarouselDashboard() {
 
     try {
       setUploading(true);
-      const res = await axios.post(
+      await axios.post(
         `${import.meta.env.VITE_API_URL}/api/carousel-images`,
         formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
       setMessage("✅ Upload successful!");
       setFile(null);
@@ -74,15 +72,15 @@ export default function AdminCarouselDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center">
-      <div className="w-full max-w-4xl bg-white shadow-lg p-4 rounded-lg mt-0">
-        <h1 className="text-2xl font-bold text-center mb-6">
-          🖼️ Admin Carousel Dashboard
+      <div className="w-full max-w-3xl bg-white shadow p-3 rounded-lg mt-0">
+        <h1 className="text-lg font-semibold text-center mb-4">
+          🖼️ Carousel Manager
         </h1>
 
         {/* Upload Form */}
-        <form onSubmit={handleUpload} className="mb-6 text-center">
-          <div className="flex justify-center items-center gap-4 flex-wrap">
-            <label className="bg-blue-600 text-white px-5 py-2 rounded cursor-pointer hover:bg-blue-700 transition">
+        <form onSubmit={handleUpload} className="mb-4 text-center">
+          <div className="flex justify-center items-center gap-2 flex-wrap">
+            <label className="bg-blue-600 text-white px-3 py-1 text-sm rounded cursor-pointer hover:bg-blue-700 transition">
               Choose File
               <input
                 type="file"
@@ -96,24 +94,23 @@ export default function AdminCarouselDashboard() {
             <button
               type="submit"
               disabled={uploading}
-              className="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 disabled:opacity-50 transition"
+              className="bg-green-600 text-white px-3 py-1 text-sm rounded hover:bg-green-700 disabled:opacity-50 transition"
             >
               {uploading ? "Uploading..." : "Upload"}
             </button>
           </div>
 
-          {/* Show selected file name */}
+          {/* Selected file */}
           {file && (
-            <p className="mt-3 text-sm text-gray-600">
-              Selected File: <span className="font-medium">{file.name}</span>
+            <p className="mt-2 text-xs text-gray-600">
+              File: <span className="font-medium">{file.name}</span>
             </p>
           )}
-
-          {message && <p className="mt-2 text-sm text-gray-700">{message}</p>}
+          {message && <p className="mt-1 text-xs text-gray-700">{message}</p>}
         </form>
 
-        {/* Image Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {/* Images */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           {images.map(({ _id, url }) => (
             <div
               key={_id}
@@ -122,14 +119,14 @@ export default function AdminCarouselDashboard() {
               <img
                 src={url}
                 alt="Carousel"
-                className="w-full h-40 object-cover"
+                className="w-full h-28 object-cover"
               />
               <button
                 onClick={() => handleDelete(_id)}
                 disabled={deletingId === _id}
-                className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 text-sm rounded hover:bg-red-700 disabled:opacity-50"
+                className="absolute top-1 right-1 bg-red-600 text-white px-2 py-0.5 text-xs rounded hover:bg-red-700 disabled:opacity-50"
               >
-                {deletingId === _id ? "Deleting..." : "Delete"}
+                {deletingId === _id ? "..." : "✖"}
               </button>
             </div>
           ))}
