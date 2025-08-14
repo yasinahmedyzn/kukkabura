@@ -6,30 +6,39 @@ const Cart = require("../models/Cart");
 const TopProduct = require("../models/TopProduct");
 const NewProduct = require("../models/NewProduct");
 
+// Helper: populate product from multiple collections
+const populateProduct = async (productId) => {
+  let product = await TopProduct.findById(productId);
+  if (!product) product = await NewProduct.findById(productId);
+  return product;
+};
+
 // 📌 Get current user's cart
 router.get("/", verifyToken, async (req, res) => {
   try {
-    const cart = await Cart.findOne({ userId: req.user.id }).populate("items.productId");
-    res.json(cart || { userId: req.user.id, items: [] });
+    const cart = await Cart.findOne({ userId: req.user.id });
+    if (!cart) return res.json({ userId: req.user.id, items: [] });
+
+    const itemsWithProduct = await Promise.all(
+      cart.items.map(async (item) => {
+        const product = await populateProduct(item.productId);
+        return { ...item._doc, productId: product }; // Replace productId with full product
+      })
+    );
+
+    res.json({ ...cart._doc, items: itemsWithProduct });
   } catch (err) {
     console.error("GET /cart error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-// 📌 Add product to cart (TopProduct or NewProduct)
+// 📌 Add product to cart (or increase quantity)
 router.post("/", verifyToken, async (req, res) => {
   const { productId, quantity = 1 } = req.body;
 
   try {
-    // Check TopProduct first
-    let product = await TopProduct.findById(productId);
-
-    // If not found, check NewProduct
-    if (!product) {
-      product = await NewProduct.findById(productId);
-    }
-
+    const product = await populateProduct(productId);
     if (!product) return res.status(404).json({ message: "Product not found" });
 
     let cart = await Cart.findOne({ userId: req.user.id });
@@ -40,14 +49,23 @@ router.post("/", verifyToken, async (req, res) => {
     );
 
     if (itemIndex > -1) {
-      cart.items[itemIndex].quantity += quantity; // Increase quantity
+      cart.items[itemIndex].quantity += quantity;
     } else {
       cart.items.push({ productId, quantity });
     }
 
     await cart.save();
-    const updatedCart = await Cart.findOne({ userId: req.user.id }).populate("items.productId");
-    res.json(updatedCart);
+
+    // Populate items after saving
+    const updatedCart = await Cart.findOne({ userId: req.user.id });
+    const itemsWithProduct = await Promise.all(
+      updatedCart.items.map(async (item) => {
+        const product = await populateProduct(item.productId);
+        return { ...item._doc, productId: product };
+      })
+    );
+
+    res.json({ ...updatedCart._doc, items: itemsWithProduct });
   } catch (err) {
     console.error("POST /cart error:", err);
     res.status(500).json({ message: "Server error" });
@@ -66,19 +84,25 @@ router.put("/:productId", verifyToken, async (req, res) => {
     const itemIndex = cart.items.findIndex(
       (item) => item.productId.toString() === productId
     );
-
     if (itemIndex === -1) return res.status(404).json({ message: "Product not in cart" });
 
     if (quantity <= 0) {
-      // Remove item if quantity <= 0
       cart.items.splice(itemIndex, 1);
     } else {
       cart.items[itemIndex].quantity = quantity;
     }
 
     await cart.save();
-    const updatedCart = await Cart.findOne({ userId: req.user.id }).populate("items.productId");
-    res.json(updatedCart);
+
+    const updatedCart = await Cart.findOne({ userId: req.user.id });
+    const itemsWithProduct = await Promise.all(
+      updatedCart.items.map(async (item) => {
+        const product = await populateProduct(item.productId);
+        return { ...item._doc, productId: product };
+      })
+    );
+
+    res.json({ ...updatedCart._doc, items: itemsWithProduct });
   } catch (err) {
     console.error("PUT /cart/:productId error:", err);
     res.status(500).json({ message: "Server error" });
@@ -96,8 +120,16 @@ router.delete("/:productId", verifyToken, async (req, res) => {
     );
 
     await cart.save();
-    const updatedCart = await Cart.findOne({ userId: req.user.id }).populate("items.productId");
-    res.json(updatedCart);
+
+    const updatedCart = await Cart.findOne({ userId: req.user.id });
+    const itemsWithProduct = await Promise.all(
+      updatedCart.items.map(async (item) => {
+        const product = await populateProduct(item.productId);
+        return { ...item._doc, productId: product };
+      })
+    );
+
+    res.json({ ...updatedCart._doc, items: itemsWithProduct });
   } catch (err) {
     console.error("DELETE /cart/:productId error:", err);
     res.status(500).json({ message: "Server error" });
@@ -107,7 +139,7 @@ router.delete("/:productId", verifyToken, async (req, res) => {
 // 📌 Clear entire cart
 router.delete("/", verifyToken, async (req, res) => {
   try {
-    const cart = await Cart.findOneAndDelete({ userId: req.user.id });
+    await Cart.findOneAndDelete({ userId: req.user.id });
     res.json({ message: "Cart cleared", items: [] });
   } catch (err) {
     console.error("DELETE /cart error:", err);

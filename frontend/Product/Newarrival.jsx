@@ -2,13 +2,14 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Heart, ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
-import "./styles.css";
 import { useCart } from "../src/context/CartContext";
 
 export default function Newarrival() {
   const [products, setProducts] = useState([]);
   const [hoveredProduct, setHoveredProduct] = useState(null);
+  const [cartHover, setCartHover] = useState(null);
   const [favorites, setFavorites] = useState(new Set());
+  const [popupMessage, setPopupMessage] = useState("");
   const scrollContainerRef = useRef(null);
 
   const { addToCart } = useCart();
@@ -55,8 +56,21 @@ export default function Newarrival() {
     setFavorites(newFavorites);
   };
 
+  const handleAddToCart = (productId) => {
+    addToCart(productId, 1);
+    setPopupMessage("Item added to cart successfully!");
+    setTimeout(() => setPopupMessage(""), 2000);
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto px-4 py-6 relative">
+      {/* Popup Notification */}
+      {popupMessage && (
+        <div className="fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-md z-50 text-sm">
+          {popupMessage}
+        </div>
+      )}
+
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-base sm:text-xl font-bold text-gray-800 mb-3">
           New Arrival Product
@@ -86,7 +100,7 @@ export default function Newarrival() {
       {/* Product List */}
       <div
         ref={scrollContainerRef}
-        className="overflow-x-auto scroll-smooth hide-scrollbar"
+        className="overflow-x-auto scroll-smooth"
       >
         <div className="flex gap-4">
           {products.map((product) => (
@@ -94,12 +108,14 @@ export default function Newarrival() {
               <ProductCard
                 product={product}
                 isHovered={hoveredProduct === product._id}
+                cartHovered={cartHover === product._id}
                 isFavorite={favorites.has(product._id)}
                 onHover={() => setHoveredProduct(product._id)}
                 onLeave={() => setHoveredProduct(null)}
+                onCartHover={() => setCartHover(product._id)}
+                onCartLeave={() => setCartHover(null)}
                 onToggleFavorite={() => toggleFavorite(product._id)}
-                // ✅ Send only productId & quantity to backend
-                onAddToCart={() => addToCart(product._id, 1)}
+                onAddToCart={() => handleAddToCart(product._id)}
               />
             </div>
           ))}
@@ -112,9 +128,12 @@ export default function Newarrival() {
 function ProductCard({
   product,
   isHovered,
+  cartHovered,
   isFavorite,
   onHover,
   onLeave,
+  onCartHover,
+  onCartLeave,
   onToggleFavorite,
   onAddToCart,
 }) {
@@ -179,7 +198,13 @@ function ProductCard({
               e.stopPropagation();
               onAddToCart();
             }}
-            className="p-1.5 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors"
+            onMouseEnter={onCartHover}
+            onMouseLeave={onCartLeave}
+            onTouchStart={onCartHover}
+            onTouchEnd={onCartLeave}
+            className={`p-1.5 rounded-md transition-colors ${
+              cartHovered ? "bg-red-600" : "bg-gray-900"
+            } text-white hover:bg-red-600`}
           >
             <ShoppingCart className="w-3 h-3" />
           </button>
