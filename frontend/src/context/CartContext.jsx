@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import api from "../api/api"; // Your axios instance
+import api from "../api/Api"; // Your axios instance
 
 const CartContext = createContext();
 
