@@ -40,6 +40,10 @@ app.use("/api/top-products", topProductsRoutes);
 const newProductsRoutes = require("./routes/newProduct.js");
 app.use("/api/new-products", newProductsRoutes);
 
+//Discount Product Routes
+const discountProductsRoutes = require("./routes/discountProducts.js");
+app.use("/api/discount-products", discountProductsRoutes);
+
 //cart
 const cartRoutes = require("./routes/cart");
 app.use("/api/cart", cartRoutes);

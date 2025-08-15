@@ -7,17 +7,14 @@ import { useCart } from "../src/context/CartContext";
 export default function Newarrival() {
   const [products, setProducts] = useState([]);
   const [hoveredProduct, setHoveredProduct] = useState(null);
-  const [cartHover, setCartHover] = useState(null);
   const [favorites, setFavorites] = useState(new Set());
-  const [popupMessage, setPopupMessage] = useState("");
+  const [toast, setToast] = useState(null);
   const scrollContainerRef = useRef(null);
-
   const { addToCart } = useCart();
 
   const productsPerPageDesktop = 5;
   const productsPerPageMobile = 2;
 
-  // ✅ Fetch products from backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -35,39 +32,30 @@ export default function Newarrival() {
   const scrollByPage = (direction) => {
     const container = scrollContainerRef.current;
     if (!container) return;
-
     const isMobile = window.innerWidth < 768;
-    const productsPerPage = isMobile
-      ? productsPerPageMobile
-      : productsPerPageDesktop;
+    const productsPerPage = isMobile ? productsPerPageMobile : productsPerPageDesktop;
     const productWidth = container.clientWidth / productsPerPage;
-    const scrollAmount = productWidth * productsPerPage * direction;
-
-    container.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    container.scrollBy({ left: productWidth * productsPerPage * direction, behavior: "smooth" });
   };
 
   const toggleFavorite = (productId) => {
     const newFavorites = new Set(favorites);
-    if (newFavorites.has(productId)) {
-      newFavorites.delete(productId);
-    } else {
-      newFavorites.add(productId);
-    }
+    if (newFavorites.has(productId)) newFavorites.delete(productId);
+    else newFavorites.add(productId);
     setFavorites(newFavorites);
   };
 
-  const handleAddToCart = (productId) => {
-    addToCart(productId, 1);
-    setPopupMessage("Item added to cart successfully!");
-    setTimeout(() => setPopupMessage(""), 2000);
+  const handleAddToCart = async (productId) => {
+    await addToCart(productId, 1);
+    setToast("Item added to cart successfully!");
+    setTimeout(() => setToast(null), 2000);
   };
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 py-6 relative">
-      {/* Popup Notification */}
-      {popupMessage && (
-        <div className="fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-md z-50 text-sm">
-          {popupMessage}
+      {toast && (
+        <div className="fixed top-5 right-5 bg-green-500 text-white px-4 py-2 rounded shadow-md z-50 transition-all">
+          {toast}
         </div>
       )}
 
@@ -75,12 +63,9 @@ export default function Newarrival() {
         <h2 className="text-base sm:text-xl font-bold text-gray-800 mb-3">
           New Arrival Product
         </h2>
-        <button className="text-sm text-gray-600 hover:text-gray-900 underline">
-          View all
-        </button>
+        <button className="text-sm text-gray-600 hover:text-gray-900 underline">View all</button>
       </div>
 
-      {/* Scroll Buttons */}
       <button
         onClick={() => scrollByPage(-1)}
         aria-label="Scroll left"
@@ -97,23 +82,16 @@ export default function Newarrival() {
         <ChevronRight className="w-5 h-5 text-gray-700" />
       </button>
 
-      {/* Product List */}
-      <div
-        ref={scrollContainerRef}
-        className="overflow-x-auto scroll-smooth"
-      >
+      <div ref={scrollContainerRef} className="overflow-x-auto scroll-smooth hide-scrollbar">
         <div className="flex gap-4">
           {products.map((product) => (
             <div key={product._id} className="flex-shrink-0 w-1/2 md:w-[20%]">
               <ProductCard
                 product={product}
                 isHovered={hoveredProduct === product._id}
-                cartHovered={cartHover === product._id}
                 isFavorite={favorites.has(product._id)}
                 onHover={() => setHoveredProduct(product._id)}
                 onLeave={() => setHoveredProduct(null)}
-                onCartHover={() => setCartHover(product._id)}
-                onCartLeave={() => setCartHover(null)}
                 onToggleFavorite={() => toggleFavorite(product._id)}
                 onAddToCart={() => handleAddToCart(product._id)}
               />
@@ -125,21 +103,15 @@ export default function Newarrival() {
   );
 }
 
-function ProductCard({
-  product,
-  isHovered,
-  cartHovered,
-  isFavorite,
-  onHover,
-  onLeave,
-  onCartHover,
-  onCartLeave,
-  onToggleFavorite,
-  onAddToCart,
-}) {
+function ProductCard({ product, isHovered, isFavorite, onHover, onLeave, onToggleFavorite, onAddToCart }) {
+  const [hoverCart, setHoverCart] = useState(false);
+
   return (
-    <div className="bg-white rounded-lg border border-gray-100 p-3 md:p-4 relative group hover:shadow-md transition-shadow duration-200 cursor-pointer">
-      {/* Favorite Button */}
+    <div
+      className="bg-white rounded-lg border border-gray-100 p-3 md:p-4 relative group hover:shadow-md transition-shadow duration-200 cursor-pointer"
+      onMouseEnter={onHover}
+      onMouseLeave={onLeave}
+    >
       <button
         onClick={(e) => {
           e.stopPropagation();
@@ -147,64 +119,44 @@ function ProductCard({
         }}
         className="absolute top-2 right-2 z-10 p-1 rounded-full hover:bg-gray-100 transition-colors"
       >
-        <Heart
-          className={`w-4 h-4 ${
-            isFavorite
-              ? "fill-red-500 text-red-500"
-              : "text-gray-400 hover:text-red-500"
-          }`}
-        />
+        <Heart className={`w-4 h-4 ${isFavorite ? "fill-red-500 text-red-500" : "text-gray-400 hover:text-red-500"}`} />
       </button>
 
-      {/* Product Image */}
-      <div
-        className="relative mb-3"
-        onMouseEnter={onHover}
-        onMouseLeave={onLeave}
-      >
+      <div className="relative mb-3">
         <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden relative">
           <img
             src={product.imageUrl}
             alt={product.name}
-            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${
-              isHovered ? "opacity-0" : "opacity-100"
-            }`}
+            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${isHovered ? "opacity-0" : "opacity-100"}`}
           />
           {product.hoverImageUrl && (
             <img
               src={product.hoverImageUrl}
               alt={`${product.name} - alternate view`}
-              className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${
-                isHovered ? "opacity-100" : "opacity-0"
-              }`}
+              className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-0"}`}
             />
           )}
         </div>
       </div>
 
-      {/* Product Info */}
       <div className="space-y-1">
         <p className="text-xs font-medium text-gray-900">{product.brand}</p>
-        <h3 className="text-xs md:text-sm text-gray-700 line-clamp-2 leading-tight">
-          {product.name}
-        </h3>
+        <h3 className="text-xs md:text-sm text-gray-700 line-clamp-2 leading-tight">{product.name}</h3>
 
         <div className="flex items-center justify-between pt-2">
-          <span className="text-sm font-semibold text-red-600">
-            ৳ {product.price}
-          </span>
+          <span className="text-sm font-semibold text-red-600">৳ {product.price}</span>
           <button
+            onMouseEnter={() => setHoverCart(true)}
+            onMouseLeave={() => setHoverCart(false)}
+            onTouchStart={() => setHoverCart(true)}   // Mobile
+            onTouchEnd={() => setHoverCart(false)}    // Mobile
             onClick={(e) => {
               e.stopPropagation();
               onAddToCart();
             }}
-            onMouseEnter={onCartHover}
-            onMouseLeave={onCartLeave}
-            onTouchStart={onCartHover}
-            onTouchEnd={onCartLeave}
             className={`p-1.5 rounded-md transition-colors ${
-              cartHovered ? "bg-red-600" : "bg-gray-900"
-            } text-white hover:bg-red-600`}
+              hoverCart ? "bg-red-500 text-white" : "bg-gray-900 text-white hover:bg-gray-800"
+            }`}
           >
             <ShoppingCart className="w-3 h-3" />
           </button>

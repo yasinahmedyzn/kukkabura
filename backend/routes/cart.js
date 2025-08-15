@@ -5,11 +5,13 @@ const verifyToken = require("../middleware/authMiddleware");
 const Cart = require("../models/Cart");
 const TopProduct = require("../models/TopProduct");
 const NewProduct = require("../models/NewProduct");
+const DiscountProduct = require("../models/DiscountProducts");
 
 // Helper: populate product from multiple collections
 const populateProduct = async (productId) => {
   let product = await TopProduct.findById(productId);
   if (!product) product = await NewProduct.findById(productId);
+  if (!product) product = await DiscountProduct.findById(productId);
   return product;
 };
 
