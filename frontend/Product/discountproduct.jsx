@@ -147,7 +147,7 @@ function ProductCard({ product, isHovered, isFavorite, onHover, onLeave, onToggl
            <span className="text-xs text-gray-400 line-through">
               ৳ {product.price}
             </span>
-          <span className="text-sm font-semibold text-red-600 -ml-30">৳ {product.discprice}</span>
+          <span className="text-sm font-semibold text-red-600 ml-[-40px] md:ml-[-120px]">৳ {product.discprice}</span>
           <button
             onMouseEnter={() => setHoverCart(true)}
             onMouseLeave={() => setHoverCart(false)}
