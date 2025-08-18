@@ -61,7 +61,7 @@ export default function DiscountedProduct() {
 
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-base sm:text-xl font-bold text-gray-800 mb-3">
-          New Arrival Product
+          60% Discount Product
         </h2>
         <button className="text-sm text-gray-600 hover:text-gray-900 underline">View all</button>
       </div>

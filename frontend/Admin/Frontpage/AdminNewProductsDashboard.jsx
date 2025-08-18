@@ -78,7 +78,7 @@ export default function AdminNewProduct() {
     if (!confirm("Are you sure you want to delete this product?")) return;
 
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/top-products/${product._id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/new-products/${product._id}`, {
         data: {
           imagePublicId: product.imagePublicId,
           hoverImagePublicId: product.hoverImagePublicId,
@@ -189,7 +189,7 @@ export default function AdminNewProduct() {
                 
                 {/* Delete Button */}
                 <button
-                  onClick={() => handleDelete(p._id)}
+                  onClick={() => handleDelete(p)}
                   className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs hover:bg-red-600 z-10"
                 >
                   X
