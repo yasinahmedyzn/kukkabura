@@ -74,12 +74,17 @@ export default function AdminTopSellingProduct() {
   };
 
   // Delete a product
-  const handleDelete = async (id) => {
+  const handleDelete = async (product) => {
     if (!confirm("Are you sure you want to delete this product?")) return;
 
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/top-products/${id}`);
-      setProducts((prev) => prev.filter((p) => p._id !== id));
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/top-products/${product._id}`, {
+        data: {
+          imagePublicId: product.imagePublicId,
+          hoverImagePublicId: product.hoverImagePublicId,
+        },
+      });
+      setProducts((prev) => prev.filter((p) => p._id !== product._id));
     } catch (err) {
       console.error("Failed to delete product:", err);
       alert("Failed to delete product.");
@@ -181,10 +186,10 @@ export default function AdminTopSellingProduct() {
           <div className="grid grid-cols-2 gap-2">
             {products.map((p) => (
               <div key={p._id} className="relative border rounded p-2 text-xs">
-                
+
                 {/* Delete Button */}
                 <button
-                  onClick={() => handleDelete(p._id)}
+                  onClick={() => handleDelete(p)}
                   className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs hover:bg-red-600 z-10"
                 >
                   X

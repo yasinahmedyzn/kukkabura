@@ -74,12 +74,17 @@ export default function AdminNewProduct() {
   };
 
   // Delete a product
-  const handleDelete = async (id) => {
+  const handleDelete = async (product) => {
     if (!confirm("Are you sure you want to delete this product?")) return;
 
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/new-products/${id}`);
-      setProducts((prev) => prev.filter((p) => p._id !== id));
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/top-products/${product._id}`, {
+        data: {
+          imagePublicId: product.imagePublicId,
+          hoverImagePublicId: product.hoverImagePublicId,
+        },
+      });
+      setProducts((prev) => prev.filter((p) => p._id !== product._id));
     } catch (err) {
       console.error("Failed to delete product:", err);
       alert("Failed to delete product.");

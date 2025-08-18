@@ -1,23 +1,25 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../config/cloudinary");
 const CarouselImage = require("../models/CarouselImage");
-const path = require("path");
-const fs = require("fs");
 
-// Configure multer to store files in the /uploads folder
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/"),
-  filename: (req, file, cb) =>
-    cb(null, Date.now() + path.extname(file.originalname)),
+// Multer storage for Cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => ({
+    folder: "carouselImages",
+    allowed_formats: ["jpg", "png", "jpeg", "webp"],
+    public_id: `${Date.now()}-${file.originalname}`,
+  }),
 });
 
 const upload = multer({ storage });
 
-/**
- * GET /api/carousel-images
- * Return array of image URLs (for frontend carousel use)
- */
+// -----------------------------
+// GET ALL IMAGE URLs FOR FRONTEND
+// -----------------------------
 router.get("/", async (req, res) => {
   try {
     const images = await CarouselImage.find();
@@ -29,33 +31,30 @@ router.get("/", async (req, res) => {
   }
 });
 
-/**
- * GET /api/carousel-images/all
- * Return array of {_id, url} objects (for admin dashboard)
- */
+// -----------------------------
+// GET ALL IMAGES WITH _ID FOR ADMIN
+// -----------------------------
 router.get("/all", async (req, res) => {
   try {
     const images = await CarouselImage.find();
-    res.json(images); // Includes _id and url
+    res.json(images); // Includes _id, url, publicId
   } catch (err) {
     console.error("Error fetching images:", err);
     res.status(500).json({ error: "Failed to fetch images" });
   }
 });
 
-/**
- * POST /api/carousel-images
- * Upload a new carousel image
- */
+// -----------------------------
+// UPLOAD NEW CAROUSEL IMAGE
+// -----------------------------
 router.post("/", upload.single("image"), async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: "No image file uploaded" });
-    }
+    if (!req.file) return res.status(400).json({ error: "No image uploaded" });
 
-    const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+    const imageUrl = req.file.path;           // Cloudinary URL
+    const imagePublicId = req.file.filename;  // Cloudinary public_id
 
-    const newImage = new CarouselImage({ url: imageUrl });
+    const newImage = new CarouselImage({ url: imageUrl, publicId: imagePublicId });
     await newImage.save();
 
     res.status(201).json({ message: "Image uploaded", url: imageUrl });
@@ -65,30 +64,23 @@ router.post("/", upload.single("image"), async (req, res) => {
   }
 });
 
-/**
- * DELETE /api/carousel-images/:id
- * Delete an image by its MongoDB ID
- */
+// -----------------------------
+// DELETE CAROUSEL IMAGE
+// -----------------------------
 router.delete("/:id", async (req, res) => {
   try {
     const image = await CarouselImage.findById(req.params.id);
     if (!image) return res.status(404).json({ error: "Image not found" });
 
-    // Extract filename from stored URL
-    const filename = image.url.split("/uploads/")[1];
-    const filePath = path.join(__dirname, "../uploads", filename);
+    // Delete from Cloudinary
+    if (image.publicId) {
+      await cloudinary.uploader.destroy(image.publicId);
+    }
 
-    // Attempt to delete image file from disk
-    fs.unlink(filePath, (err) => {
-      if (err) {
-        console.error("Error deleting file from disk:", err);
-      }
-    });
-
-    // Remove image from database
+    // Remove from MongoDB
     await CarouselImage.findByIdAndDelete(req.params.id);
 
-    res.json({ message: "Image deleted" });
+    res.json({ message: "Image deleted successfully" });
   } catch (err) {
     console.error("Error deleting image:", err);
     res.status(500).json({ error: "Failed to delete image" });

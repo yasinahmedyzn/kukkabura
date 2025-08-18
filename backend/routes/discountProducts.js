@@ -1,60 +1,96 @@
 const express = require("express");
 const multer = require("multer");
-const path = require("path");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../config/cloudinary");
 const DiscountProduct = require("../models/DiscountProducts");
 
 const router = express.Router();
 
-const storage = multer.diskStorage({
-  destination: "uploads/",
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
+// Multer storage for Cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => ({
+    folder: "discountProducts",
+    allowed_formats: ["jpg", "png", "jpeg", "webp"],
+    public_id: `${Date.now()}-${file.originalname}`,
+  }),
 });
+
 const upload = multer({ storage });
 
-// Create product
-router.post("/", upload.fields([
-  { name: "image", maxCount: 1 },
-  { name: "hoverImage", maxCount: 1 }
-]), async (req, res) => {
-  try {
-    const { brand, name, price, discprice } = req.body;
+// -----------------------------
+// CREATE DISCOUNT PRODUCT
+// -----------------------------
+router.post(
+  "/",
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "hoverImage", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    try {
+      const { brand, name, price, discprice } = req.body;
 
-    if (!req.files.image || !req.files.hoverImage) {
-      return res.status(400).json({ message: "Both images are required" });
+      if (!req.files.image || !req.files.hoverImage)
+        return res.status(400).json({ message: "Both images are required" });
+
+      const imageUrl = req.files.image[0].path;
+      const hoverImageUrl = req.files.hoverImage[0].path;
+      const imagePublicId = req.files.image[0].filename;
+      const hoverImagePublicId = req.files.hoverImage[0].filename;
+
+      const product = new DiscountProduct({
+        brand,
+        name,
+        price,
+        discprice,
+        imageUrl,
+        hoverImageUrl,
+        imagePublicId,
+        hoverImagePublicId,
+      });
+
+      await product.save();
+      res.status(201).json(product);
+    } catch (err) {
+      console.error("Error creating discount product:", err);
+      res.status(500).json({ message: "Server error: " + err.message });
     }
-
-    const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${req.files.image[0].filename}`;
-    const hoverImageUrl = `${req.protocol}://${req.get("host")}/uploads/${req.files.hoverImage[0].filename}`;
-
-    const product = new DiscountProduct({ brand, name, price, discprice, imageUrl, hoverImageUrl });
-    await product.save();
-
-    res.status(201).json(product);
-  } catch (err) {
-    console.error("Error creating product:", err);
-    res.status(500).json({ message: "Server error: " + err.message });
   }
-});
+);
 
-// Get all products
+// -----------------------------
+// GET ALL DISCOUNT PRODUCTS
+// -----------------------------
 router.get("/", async (req, res) => {
   try {
     const products = await DiscountProduct.find().sort({ createdAt: -1 });
     res.json(products);
   } catch (err) {
+    console.error("Error fetching discount products:", err);
     res.status(500).json({ message: err.message });
   }
 });
 
-// Delete product
+// -----------------------------
+// DELETE DISCOUNT PRODUCT + IMAGES
+// -----------------------------
 router.delete("/:id", async (req, res) => {
   try {
+    const product = await DiscountProduct.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    // Delete images from Cloudinary
+    if (product.imagePublicId) await cloudinary.uploader.destroy(product.imagePublicId);
+    if (product.hoverImagePublicId) await cloudinary.uploader.destroy(product.hoverImagePublicId);
+
+    // Delete from MongoDB
     await DiscountProduct.findByIdAndDelete(req.params.id);
-    res.json({ message: "Deleted successfully" });
+
+    res.json({ message: "Deleted discount product and images successfully" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Failed to delete discount product:", err);
+    res.status(500).json({ message: "Server error: " + err.message });
   }
 });
 
