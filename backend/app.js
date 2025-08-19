@@ -14,6 +14,12 @@ const allowedOrigins = [
   "https://kukkabura-frontend.onrender.com",
 ];
 
+app.use(cors({
+  origin: "https://kukkabura-frontend.vercel.app", // your frontend URL
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
 app.use(
   cors({
     origin: allowedOrigins,
@@ -47,9 +53,6 @@ app.use("/api/discount-products", discountProductsRoutes);
 //cart
 const cartRoutes = require("./routes/cart");
 app.use("/api/cart", cartRoutes);
-
-// Serve uploads statically
-app.use("/uploads", express.static("uploads"));
 
 
 
