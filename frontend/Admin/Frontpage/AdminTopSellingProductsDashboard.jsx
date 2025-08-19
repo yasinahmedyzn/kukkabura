@@ -12,6 +12,8 @@ export default function AdminTopSellingProduct() {
   const [products, setProducts] = useState([]);
   const [message, setMessage] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [editingProductId, setEditingProductId] = useState(null);
+  const [editForm, setEditForm] = useState({ name: "", price: "" });
 
   const fileInputMain = useRef(null);
   const fileInputHover = useRef(null);
@@ -38,6 +40,12 @@ export default function AdminTopSellingProduct() {
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
+  };
+
+  // Handle edit form changes
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm((prev) => ({ ...prev, [name]: value }));
   };
 
   // Upload new product
@@ -89,6 +97,31 @@ export default function AdminTopSellingProduct() {
       console.error("Failed to delete product:", err);
       alert("Failed to delete product.");
     }
+  };
+
+  // Start editing a product
+  const handleEditClick = (product) => {
+    setEditingProductId(product._id);
+    setEditForm({ name: product.name, price: product.price });
+  };
+
+  // Save edited product
+  const handleSaveEdit = async (productId) => {
+    try {
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/top-products/${productId}`, editForm);
+      setProducts((prev) =>
+        prev.map((p) => (p._id === productId ? { ...p, name: editForm.name, price: editForm.price } : p))
+      );
+      setEditingProductId(null);
+    } catch (err) {
+      console.error("Failed to update product:", err);
+      alert("Failed to update product.");
+    }
+  };
+
+  // Cancel editing
+  const handleCancelEdit = () => {
+    setEditingProductId(null);
   };
 
   return (
@@ -192,24 +225,69 @@ export default function AdminTopSellingProduct() {
                   onClick={() => handleDelete(p)}
                   className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs hover:bg-red-600 z-10"
                 >
-                  X
+                  ✕
                 </button>
 
-                <div className="relative group">
-                  <img
-                    src={p.imageUrl}
-                    alt={p.name}
-                    className="w-full h-24 object-contain transition-opacity duration-300 group-hover:opacity-0"
-                  />
-                  <img
-                    src={p.hoverImageUrl}
-                    alt={p.name + " hover"}
-                    className="absolute top-0 left-0 w-full h-24 object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                  />
-                </div>
-                <h4 className="font-medium mt-1">{p.name}</h4>
-                <p className="text-gray-500">{p.brand}</p>
-                <p className="text-blue-600 font-bold">${p.price}</p>
+                {/* Edit Icon */}
+                <button
+                  onClick={() => handleEditClick(p)}
+                  className="absolute top-1 right-7 bg-yellow-400 text-white rounded-full p-1 text-xs hover:bg-yellow-500 z-10"
+                >
+                  ✎
+                </button>
+
+                {editingProductId === p._id ? (
+                  // Edit Mode
+                  <div>
+                    <input
+                      type="text"
+                      name="name"
+                      value={editForm.name}
+                      onChange={handleEditChange}
+                      className="w-full border rounded px-1 py-1 mb-1 text-xs focus:outline-none focus:ring focus:ring-blue-200"
+                    />
+                    <input
+                      type="number"
+                      name="price"
+                      value={editForm.price}
+                      onChange={handleEditChange}
+                      className="w-full border rounded px-1 py-1 mb-1 text-xs focus:outline-none focus:ring focus:ring-blue-200"
+                    />
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => handleSaveEdit(p._id)}
+                        className="flex-1 bg-green-500 text-white text-xs rounded py-1 hover:bg-green-600"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        className="flex-1 bg-gray-400 text-white text-xs rounded py-1 hover:bg-gray-500"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  // Display Mode
+                  <>
+                    <div className="relative group">
+                      <img
+                        src={p.imageUrl}
+                        alt={p.name}
+                        className="w-full h-24 object-contain transition-opacity duration-300 group-hover:opacity-0"
+                      />
+                      <img
+                        src={p.hoverImageUrl}
+                        alt={p.name + " hover"}
+                        className="absolute top-0 left-0 w-full h-24 object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                      />
+                    </div>
+                    <h4 className="font-medium mt-1">{p.name}</h4>
+                    <p className="text-gray-500">{p.brand}</p>
+                    <p className="text-blue-600 font-bold">${p.price}</p>
+                  </>
+                )}
               </div>
             ))}
           </div>
