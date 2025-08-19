@@ -10,10 +10,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: [
-    'https://kukkabura-git-main-mdyasinahmed-7053s-projects.vercel.app',
-    'http://localhost:5173'
-  ],
+  origin: '*', // allow all origins
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }));
 
