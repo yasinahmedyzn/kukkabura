@@ -15,7 +15,7 @@ import logo from "../Images/logo.svg";
 const Navbar = () => {
 
   const { clearCart, cartCount } = useCart();
-  
+
   const [showDropdown, setShowDropdown] = useState(false); // categories (desktop & mobile)
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
@@ -261,9 +261,10 @@ const Navbar = () => {
             <div className="flex justify-center gap-8 text-sm font-medium text-gray-700">
               {[
                 { label: "Home", path: "/" },
-                { label: "About", path: "/about" },
-                { label: "Product", path: "/product" },
-                { label: "Service", path: "/service" },
+                { label: "Brand", path: "/Brand" },
+                { label: "Makeup", path: "/Makeup" },
+                { label: "Fragnance", path: "/Fragnance" },
+                { label: "Sale & Offer", path: "/Sale&Offer" },
               ].map(({ label, path }) => (
                 <Link
                   key={label}
@@ -433,12 +434,13 @@ const Navbar = () => {
         )}
 
         {/* Mobile Bottom Links */}
-        <div className="mt-3 flex justify-center gap-5 text-sm font-medium text-gray-700">
+        <div className="mt-1 flex justify-center gap-5 text-[11px] font-sm text-gray-500">
           {[
             { label: "Home", path: "/" },
-            { label: "About", path: "/about" },
-            { label: "Product", path: "/product" },
-            { label: "Service", path: "/service" },
+            { label: "Brand", path: "/Brand" },
+            { label: "Makeup", path: "/Makeup" },
+            { label: "Fragnance", path: "/Fragnance" },
+            { label: "Sale & Offer", path: "/Sale&Offer" },
           ].map(({ label, path }) => (
             <Link
               key={label}
