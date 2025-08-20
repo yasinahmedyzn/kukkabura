@@ -13,10 +13,13 @@ export default function AdminTopSellingProduct() {
   const [message, setMessage] = useState("");
   const [uploading, setUploading] = useState(false);
   const [editingProductId, setEditingProductId] = useState(null);
-  const [editForm, setEditForm] = useState({ name: "", price: "" });
+  const [editForm, setEditForm] = useState({ name: "", price: "", image: null, hoverImage: null });
 
   const fileInputMain = useRef(null);
   const fileInputHover = useRef(null);
+
+  const fileEditMain = useRef(null);
+  const fileEditHover = useRef(null);
 
   // Fetch existing products
   const fetchProducts = async () => {
@@ -108,10 +111,20 @@ export default function AdminTopSellingProduct() {
   // Save edited product
   const handleSaveEdit = async (productId) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL}/api/top-products/${productId}`, editForm);
+      const data = new FormData();
+      data.append("name", editForm.name);
+      data.append("price", editForm.price);
+      if (editForm.image) data.append("image", editForm.image);
+      if (editForm.hoverImage) data.append("hoverImage", editForm.hoverImage);
+
+      const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/top-products/${productId}`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
       setProducts((prev) =>
-        prev.map((p) => (p._id === productId ? { ...p, name: editForm.name, price: editForm.price } : p))
+        prev.map((p) => (p._id === productId ? res.data : p))
       );
+
       setEditingProductId(null);
     } catch (err) {
       console.error("Failed to update product:", err);
@@ -242,6 +255,7 @@ export default function AdminTopSellingProduct() {
                     <input
                       type="text"
                       name="name"
+                      placeholder="Name"
                       value={editForm.name}
                       onChange={handleEditChange}
                       className="w-full border rounded px-1 py-1 mb-1 text-xs focus:outline-none focus:ring focus:ring-blue-200"
@@ -249,10 +263,52 @@ export default function AdminTopSellingProduct() {
                     <input
                       type="number"
                       name="price"
+                      placeholder="Price"
                       value={editForm.price}
                       onChange={handleEditChange}
                       className="w-full border rounded px-1 py-1 mb-1 text-xs focus:outline-none focus:ring focus:ring-blue-200"
                     />
+
+                    {/* Main Image */}
+                    <div className="flex items-center gap-2 mb-1">
+                      <button
+                        type="button"
+                        onClick={() => fileEditMain.current.click()}
+                        className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
+                      >
+                        Choose Main Image
+                      </button>
+                      <input
+                        type="file"
+                        ref={fileEditMain}
+                        name="image"
+                        accept="image/*"
+                        onChange={(e) => setEditForm((prev) => ({ ...prev, image: e.target.files[0] }))}
+                        className="hidden"
+                      />
+                      {editForm.image && <span className="text-xs text-gray-500 truncate">{editForm.image.name}</span>}
+                    </div>
+
+                    {/* Hover Image */}
+                    <div className="flex items-center gap-2 mb-1">
+                      <button
+                        type="button"
+                        onClick={() => fileEditHover.current.click()}
+                        className="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600"
+                      >
+                        Choose Hover Image
+                      </button>
+                      <input
+                        type="file"
+                        ref={fileEditHover}
+                        name="hoverImage"
+                        accept="image/*"
+                        onChange={(e) => setEditForm((prev) => ({ ...prev, hoverImage: e.target.files[0] }))}
+                        className="hidden"
+                      />
+                      {editForm.hoverImage && <span className="text-xs text-gray-500 truncate">{editForm.hoverImage.name}</span>}
+                    </div>
+
                     <div className="flex gap-1">
                       <button
                         onClick={() => handleSaveEdit(p._id)}

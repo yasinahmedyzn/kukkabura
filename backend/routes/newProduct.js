@@ -98,4 +98,63 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// -----------------------------------
+// UPDATE PRODUCT (name, price, optional images)
+// -----------------------------------
+router.put(
+  "/:id",
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "hoverImage", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    try {
+      const { name, price, brand } = req.body; // include brand also
+      const product = await TopProduct.findById(req.params.id);
+
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+
+      // ✅ Update basic fields only if provided
+      if (brand !== undefined) product.brand = brand;
+      if (name !== undefined) product.name = name;
+      if (price !== undefined) product.price = price;
+
+      // ✅ Update main image if new one uploaded
+      if (req.files && req.files.image) {
+        if (product.imagePublicId) {
+          await cloudinary.uploader.destroy(product.imagePublicId);
+        }
+        const uploadedImage = await cloudinary.uploader.upload(
+          req.files.image[0].path,
+          { folder: "top-products" }
+        );
+        product.imageUrl = uploadedImage.secure_url;
+        product.imagePublicId = uploadedImage.public_id;
+      }
+
+      // ✅ Update hover image if new one uploaded
+      if (req.files && req.files.hoverImage) {
+        if (product.hoverImagePublicId) {
+          await cloudinary.uploader.destroy(product.hoverImagePublicId);
+        }
+        const uploadedHover = await cloudinary.uploader.upload(
+          req.files.hoverImage[0].path,
+          { folder: "top-products" }
+        );
+        product.hoverImageUrl = uploadedHover.secure_url;
+        product.hoverImagePublicId = uploadedHover.public_id;
+      }
+
+      await product.save();
+      res.json(product);
+    } catch (err) {
+      console.error("Failed to update product:", err);
+      res.status(500).json({ message: "Server error: " + err.message });
+    }
+  }
+);
+
+
 module.exports = router;

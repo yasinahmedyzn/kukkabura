@@ -12,9 +12,14 @@ export default function AdminNewProduct() {
   const [products, setProducts] = useState([]);
   const [message, setMessage] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [editingProductId, setEditingProductId] = useState(null);
+  const [editForm, setEditForm] = useState({ name: "", price: "", image: null, hoverImage: null });
 
   const fileInputMain = useRef(null);
   const fileInputHover = useRef(null);
+
+  const fileEditMain = useRef(null);
+  const fileEditHover = useRef(null);
 
   // Fetch existing products
   const fetchProducts = async () => {
@@ -38,6 +43,12 @@ export default function AdminNewProduct() {
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
+  };
+
+  // Handle edit form changes
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm((prev) => ({ ...prev, [name]: value }));
   };
 
   // Upload new product
@@ -89,6 +100,41 @@ export default function AdminNewProduct() {
       console.error("Failed to delete product:", err);
       alert("Failed to delete product.");
     }
+  };
+
+  // Start editing a product
+  const handleEditClick = (product) => {
+    setEditingProductId(product._id);
+    setEditForm({ name: product.name, price: product.price });
+  };
+
+  // Save edited product
+  const handleSaveEdit = async (productId) => {
+    try {
+      const data = new FormData();
+      data.append("name", editForm.name);
+      data.append("price", editForm.price);
+      if (editForm.image) data.append("image", editForm.image);
+      if (editForm.hoverImage) data.append("hoverImage", editForm.hoverImage);
+
+      const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/new-products/${productId}`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      setProducts((prev) =>
+        prev.map((p) => (p._id === productId ? res.data : p))
+      );
+
+      setEditingProductId(null);
+    } catch (err) {
+      console.error("Failed to update product:", err);
+      alert("Failed to update product.");
+    }
+  };
+
+  // Cancel editing
+  const handleCancelEdit = () => {
+    setEditingProductId(null);
   };
 
   return (
@@ -186,30 +232,118 @@ export default function AdminNewProduct() {
           <div className="grid grid-cols-2 gap-2">
             {products.map((p) => (
               <div key={p._id} className="relative border rounded p-2 text-xs">
-                
+
                 {/* Delete Button */}
                 <button
                   onClick={() => handleDelete(p)}
                   className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs hover:bg-red-600 z-10"
                 >
-                  X
+                  ✕
                 </button>
 
-                <div className="relative group">
-                  <img
-                    src={p.imageUrl}
-                    alt={p.name}
-                    className="w-full h-24 object-contain transition-opacity duration-300 group-hover:opacity-0"
-                  />
-                  <img
-                    src={p.hoverImageUrl}
-                    alt={p.name + " hover"}
-                    className="absolute top-0 left-0 w-full h-24 object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                  />
-                </div>
-                <h4 className="font-medium mt-1">{p.name}</h4>
-                <p className="text-gray-500">{p.brand}</p>
-                <p className="text-blue-600 font-bold">${p.price}</p>
+                {/* Edit Icon */}
+                <button
+                  onClick={() => handleEditClick(p)}
+                  className="absolute top-1 right-7 bg-yellow-400 text-white rounded-full p-1 text-xs hover:bg-yellow-500 z-10"
+                >
+                  ✎
+                </button>
+
+                {editingProductId === p._id ? (
+                  // Edit Mode
+                  <div>
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Name"
+                      value={editForm.name}
+                      onChange={handleEditChange}
+                      className="w-full border rounded px-1 py-1 mb-1 text-xs focus:outline-none focus:ring focus:ring-blue-200"
+                    />
+                    <input
+                      type="number"
+                      name="price"
+                      placeholder="Price"
+                      value={editForm.price}
+                      onChange={handleEditChange}
+                      className="w-full border rounded px-1 py-1 mb-1 text-xs focus:outline-none focus:ring focus:ring-blue-200"
+                    />
+
+                    {/* Main Image */}
+                    <div className="flex items-center gap-2 mb-1">
+                      <button
+                        type="button"
+                        onClick={() => fileEditMain.current.click()}
+                        className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
+                      >
+                        Choose Main Image
+                      </button>
+                      <input
+                        type="file"
+                        ref={fileEditMain}
+                        name="image"
+                        accept="image/*"
+                        onChange={(e) => setEditForm((prev) => ({ ...prev, image: e.target.files[0] }))}
+                        className="hidden"
+                      />
+                      {editForm.image && <span className="text-xs text-gray-500 truncate">{editForm.image.name}</span>}
+                    </div>
+
+                    {/* Hover Image */}
+                    <div className="flex items-center gap-2 mb-1">
+                      <button
+                        type="button"
+                        onClick={() => fileEditHover.current.click()}
+                        className="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600"
+                      >
+                        Choose Hover Image
+                      </button>
+                      <input
+                        type="file"
+                        ref={fileEditHover}
+                        name="hoverImage"
+                        accept="image/*"
+                        onChange={(e) => setEditForm((prev) => ({ ...prev, hoverImage: e.target.files[0] }))}
+                        className="hidden"
+                      />
+                      {editForm.hoverImage && <span className="text-xs text-gray-500 truncate">{editForm.hoverImage.name}</span>}
+                    </div>
+
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => handleSaveEdit(p._id)}
+                        className="flex-1 bg-green-500 text-white text-xs rounded py-1 hover:bg-green-600"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        className="flex-1 bg-gray-400 text-white text-xs rounded py-1 hover:bg-gray-500"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  // Display Mode
+                  <>
+                    <div className="relative group">
+                      <img
+                        src={p.imageUrl}
+                        alt={p.name}
+                        className="w-full h-24 object-contain transition-opacity duration-300 group-hover:opacity-0"
+                      />
+                      <img
+                        src={p.hoverImageUrl}
+                        alt={p.name + " hover"}
+                        className="absolute top-0 left-0 w-full h-24 object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                      />
+                    </div>
+                    <h4 className="font-medium mt-1">{p.name}</h4>
+                    <p className="text-gray-500">{p.brand}</p>
+                    <p className="text-blue-600 font-bold">${p.price}</p>
+                  </>
+                )}
               </div>
             ))}
           </div>
