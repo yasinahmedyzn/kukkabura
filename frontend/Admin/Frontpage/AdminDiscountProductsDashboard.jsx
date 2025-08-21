@@ -7,6 +7,7 @@ export default function AdminDiscountProduct() {
     name: "",
     price: "",
     discprice: "",
+    category: "",
     image: null,
     hoverImage: null,
   });
@@ -14,7 +15,7 @@ export default function AdminDiscountProduct() {
   const [message, setMessage] = useState("");
   const [uploading, setUploading] = useState(false);
   const [editingProductId, setEditingProductId] = useState(null);
-  const [editForm, setEditForm] = useState({ name: "", price: "", discprice: "", image: null, hoverImage: null });
+  const [editForm, setEditForm] = useState({ name: "", price: "", discprice: "", category: "", image: null, hoverImage: null });
 
   const fileInputMain = useRef(null);
   const fileInputHover = useRef(null);
@@ -55,7 +56,7 @@ export default function AdminDiscountProduct() {
   // Upload new product
   const handleUpload = async (e) => {
     e.preventDefault();
-    if (!form.brand || !form.name || !form.price || !form.discprice || !form.image || !form.hoverImage) {
+    if (!form.brand || !form.name || !form.category || !form.price || !form.discprice || !form.image || !form.hoverImage) {
       setMessage("Please fill in all fields and select both images.");
       return;
     }
@@ -63,6 +64,11 @@ export default function AdminDiscountProduct() {
     const formData = new FormData();
     formData.append("brand", form.brand);
     formData.append("name", form.name);
+    form.category
+      .split(",")
+      .map(c => c.trim())
+      .filter(Boolean)
+      .forEach(c => formData.append("category[]", c));
     formData.append("price", form.price);
     formData.append("discprice", form.discprice);
     formData.append("image", form.image);
@@ -74,7 +80,7 @@ export default function AdminDiscountProduct() {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setMessage("✅ Product added!");
-      setForm({ brand: "", name: "", price: "", discprice: "", image: null, hoverImage: null });
+      setForm({ brand: "", name: "", category: "", price: "", discprice: "", image: null, hoverImage: null });
       fileInputMain.current.value = null;
       fileInputHover.current.value = null;
       fetchProducts();
@@ -107,7 +113,11 @@ export default function AdminDiscountProduct() {
   // Start editing a product
   const handleEditClick = (product) => {
     setEditingProductId(product._id);
-    setEditForm({ name: product.name, price: product.price, discprice: product.discprice });
+    setEditForm({
+      name: product.name,
+      price: product.price,
+      category: Array.isArray(product.category) ? product.category.join(", ") : (product.category || "")
+    });
   };
 
   // Save edited product
@@ -116,7 +126,13 @@ export default function AdminDiscountProduct() {
       const data = new FormData();
       data.append("name", editForm.name);
       data.append("price", editForm.price);
-      data.append("discprice", editForm.discprice);
+      if (editForm.category) {
+        editForm.category
+          .split(",")
+          .map(c => c.trim())
+          .filter(Boolean)
+          .forEach(c => data.append("category[]", c));
+      }
       if (editForm.image) data.append("image", editForm.image);
       if (editForm.hoverImage) data.append("hoverImage", editForm.hoverImage);
 
@@ -165,6 +181,14 @@ export default function AdminDiscountProduct() {
               value={form.name}
               onChange={handleChange}
               className="w-full border rounded px-2 py-1 focus:outline-none focus:ring focus:ring-blue-200"
+            />
+           <input
+              type="text"
+              name="category"
+              placeholder="Categories (comma separated)"
+              value={form.category}
+              onChange={handleChange}
+              className="w-full border rounded px-1 py-1 mb-1 text-xs focus:outline-none focus:ring focus:ring-blue-200"
             />
             <input
               type="number"

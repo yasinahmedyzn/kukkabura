@@ -16,6 +16,13 @@ const storage = new CloudinaryStorage({
   }),
 });
 
+function normalizeCategory(body) {
+  const raw = body["category[]"] ?? body.category;
+  if (Array.isArray(raw)) return raw.map(s => String(s).trim()).filter(Boolean);
+  if (typeof raw === "string") return raw.split(",").map(s => s.trim()).filter(Boolean);
+  return [];
+}
+
 const upload = multer({ storage });
 
 // -----------------------------
@@ -30,6 +37,8 @@ router.post(
   async (req, res) => {
     try {
       const { brand, name, price, discprice } = req.body;
+      const category = normalizeCategory(req.body);
+      if (!category.length) return res.status(400).json({ message: "Category is required" });
 
       if (!req.files.image || !req.files.hoverImage)
         return res.status(400).json({ message: "Both images are required" });
@@ -44,6 +53,7 @@ router.post(
         name,
         price,
         discprice,
+        category,
         imageUrl,
         hoverImageUrl,
         imagePublicId,
@@ -105,8 +115,11 @@ router.put(
   ]),
   async (req, res) => {
     try {
-      const { name, price, discprice, brand } = req.body; // include brand also
+      const { name, price, discprice, brand, category } = req.body; // include brand also
       const product = await TopProduct.findById(req.params.id);
+
+      const nextCategory = normalizeCategory(req.body);
+      if (nextCategory.length) product.category = nextCategory;
 
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
@@ -117,6 +130,7 @@ router.put(
       if (name !== undefined) product.name = name;
       if (price !== undefined) product.price = price;
       if (discprice !== undefined) product.discprice = discprice;
+      if (category !== undefined) product.category = category;
 
       // ✅ Update main image if new one uploaded
       if (req.files && req.files.image) {
