@@ -24,7 +24,7 @@ const CategoryProducts = () => {
   // Fetch categories
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/products/all/categories")
+      .get(`${import.meta.env.VITE_API_URL}/api/products/all/categories`)
       .then((res) => setCategories(res.data.categories || []))
       .catch((err) => console.error("Error fetching categories", err));
   }, []);
@@ -32,7 +32,7 @@ const CategoryProducts = () => {
   // Fetch brands
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/products/all/brands")
+      .get(`${import.meta.env.VITE_API_URL}/api/products/all/brands`)
       .then((res) => setBrands(res.data.brands || []))
       .catch((err) => console.error("Error fetching brands", err));
   }, []);
@@ -43,7 +43,7 @@ const CategoryProducts = () => {
     const fetchProducts = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/products/all/products",
+          `${import.meta.env.VITE_API_URL}/api/products/all/products`,
           {
             params: {
               category: selectedCategory || undefined,
