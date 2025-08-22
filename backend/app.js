@@ -18,6 +18,14 @@ app.use(cors({
 // Connect to DB
 connectDB();
 
+// Custom middleware to skip body parsing for GET requests on /api/products
+app.use('/api/products', (req, res, next) => {
+  if (req.method === 'GET') {
+    return next(); // Skip body parsing for GET requests
+  }
+  next();
+});
+
 // Routes
 const authRoutes = require("./routes/AuthRoutes");
 app.use("/api/auth", authRoutes);
@@ -41,6 +49,10 @@ app.use("/api/discount-products", discountProductsRoutes);
 //cart
 const cartRoutes = require("./routes/cart");
 app.use("/api/cart", cartRoutes);
+
+//product fetch
+const productRoutes = require("./routes/products");
+app.use("/api/products", productRoutes);
 
 
 

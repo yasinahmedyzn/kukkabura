@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Heart, ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
 import "./styles.css";
 import { useCart } from "../src/context/CartContext";
@@ -64,7 +65,9 @@ export default function TopSellingProduct() {
         <h2 className="text-base sm:text-xl font-bold text-gray-800 mb-3">
           Top Selling Product
         </h2>
-        <button className="text-sm text-gray-600 hover:text-gray-900 underline">View all</button>
+        <Link to="/product" className="text-sm text-gray-600 hover:text-gray-900 underline">
+          View all
+        </Link>
       </div>
 
       <button
@@ -155,9 +158,8 @@ function ProductCard({ product, isHovered, isFavorite, onHover, onLeave, onToggl
               e.stopPropagation();
               onAddToCart();
             }}
-            className={`p-1.5 rounded-md transition-colors ${
-              hoverCart ? "bg-red-500 text-white" : "bg-gray-900 text-white hover:bg-gray-800"
-            }`}
+            className={`p-1.5 rounded-md transition-colors ${hoverCart ? "bg-red-500 text-white" : "bg-gray-900 text-white hover:bg-gray-800"
+              }`}
           >
             <ShoppingCart className="w-3 h-3" />
           </button>

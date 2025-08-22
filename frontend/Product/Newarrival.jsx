@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Heart, ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCart } from "../src/context/CartContext";
 
@@ -63,7 +64,9 @@ export default function Newarrival() {
         <h2 className="text-base sm:text-xl font-bold text-gray-800 mb-3">
           New Arrival Product
         </h2>
-        <button className="text-sm text-gray-600 hover:text-gray-900 underline">View all</button>
+         <Link to="/product" className="text-sm text-gray-600 hover:text-gray-900 underline">
+          View all
+        </Link>
       </div>
 
       <button

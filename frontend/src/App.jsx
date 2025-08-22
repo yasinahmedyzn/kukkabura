@@ -8,6 +8,7 @@ import Success from "../Auth/success";
 import Admin_dashboard from "../Auth/admindashboard";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import CartPage from "../Pages/CartPage.jsx";
+import CategoryPage from "../Catagory/CategoryPage.jsx";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/success" element={<Success />} />
           <Route path="/admin-dashboard" element={<Admin_dashboard />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/product" element={<CategoryPage />} />
         </Routes>
       </Router>
     </AuthProvider>

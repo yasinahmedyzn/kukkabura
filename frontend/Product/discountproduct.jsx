@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Heart, ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCart } from "../src/context/CartContext";
 
@@ -63,7 +64,9 @@ export default function DiscountedProduct() {
         <h2 className="text-base sm:text-xl font-bold text-gray-800 mb-3">
           60% Discount Product
         </h2>
-        <button className="text-sm text-gray-600 hover:text-gray-900 underline">View all</button>
+        <Link to="/product" className="text-sm text-gray-600 hover:text-gray-900 underline">
+          View all
+        </Link>
       </div>
 
       <button
@@ -144,9 +147,9 @@ function ProductCard({ product, isHovered, isFavorite, onHover, onLeave, onToggl
         <h3 className="text-xs md:text-sm text-gray-700 line-clamp-2 leading-tight">{product.name}</h3>
 
         <div className="flex items-center justify-between pt-2">
-           <span className="text-xs text-gray-400 line-through">
-              ৳ {product.price}
-            </span>
+          <span className="text-xs text-gray-400 line-through">
+            ৳ {product.price}
+          </span>
           <span className="text-sm font-semibold text-red-600 ml-[-40px] md:ml-[-120px]">৳ {product.discprice}</span>
           <button
             onMouseEnter={() => setHoverCart(true)}
@@ -157,9 +160,8 @@ function ProductCard({ product, isHovered, isFavorite, onHover, onLeave, onToggl
               e.stopPropagation();
               onAddToCart();
             }}
-            className={`p-1.5 rounded-md transition-colors ${
-              hoverCart ? "bg-red-500 text-white" : "bg-gray-900 text-white hover:bg-gray-800"
-            }`}
+            className={`p-1.5 rounded-md transition-colors ${hoverCart ? "bg-red-500 text-white" : "bg-gray-900 text-white hover:bg-gray-800"
+              }`}
           >
             <ShoppingCart className="w-3 h-3" />
           </button>
