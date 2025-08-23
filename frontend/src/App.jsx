@@ -11,6 +11,7 @@ import CartPage from "../Pages/CartPage.jsx";
 import CategoryPage from "../Catagory/CategoryPage.jsx";
 import EyeProducts from "../Pages/eyes.jsx";
 import MakeupProducts from "../Pages/Makeup.jsx";
+import FragnanceProducts from "../Pages/Fragnance.jsx";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/product" element={<CategoryPage />} />
           <Route path="/product/eyes-products" element={<EyeProducts />} />
           <Route path="/product/makeup-products" element={<MakeupProducts />} />
+          <Route path="/product/fragnance-products" element={<FragnanceProducts />} />
         </Routes>
       </Router>
     </AuthProvider>

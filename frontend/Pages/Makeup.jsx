@@ -7,7 +7,7 @@ const MakeupProducts = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchEyeProducts = async () => {
+    const fetchMakeupProducts = async () => {
       setLoading(true);
       try {
         const res = await axios.get(
@@ -25,7 +25,7 @@ const MakeupProducts = () => {
       }
     };
 
-    fetchEyeProducts();
+    fetchMakeupProducts();
   }, []);
 
   return (

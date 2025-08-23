@@ -261,9 +261,9 @@ const Navbar = () => {
             <div className="flex justify-center gap-8 text-sm font-medium text-gray-700">
               {[
                 { label: "Home", path: "/" },
-                { label: "Brand", path: "/Brand" },
+                { label: "Product", path: "/product" },
                 { label: "Makeup", path: "/product/makeup-products" },
-                { label: "Fragnance", path: "/Fragnance" },
+                { label: "Fragnance", path: "/product/fragnance-products" },
                 { label: "Sale & Offer", path: "/Sale&Offer" },
               ].map(({ label, path }) => (
                 <Link
@@ -436,9 +436,9 @@ const Navbar = () => {
         <div className="mt-1 flex justify-center gap-5 text-[11px] font-sm text-gray-500">
           {[
             { label: "Home", path: "/" },
-            { label: "Brand", path: "/Brand" },
+            { label: "Product", path: "/product" },
             { label: "Makeup", path: "/product/makeup-products" },
-            { label: "Fragnance", path: "/Fragnance" },
+            { label: "Fragnance", path: "/product/fragnance-products" },
             { label: "Sale & Offer", path: "/Sale&Offer" },
           ].map(({ label, path }) => (
             <Link
