@@ -9,6 +9,8 @@ import Admin_dashboard from "../Auth/admindashboard";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import CartPage from "../Pages/CartPage.jsx";
 import CategoryPage from "../Catagory/CategoryPage.jsx";
+import EyeProducts from "../Pages/eyes.jsx";
+import MakeupProducts from "../Pages/Makeup.jsx";
 
 function App() {
   return (
@@ -23,6 +25,8 @@ function App() {
           <Route path="/admin-dashboard" element={<Admin_dashboard />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/product" element={<CategoryPage />} />
+          <Route path="/product/eyes-products" element={<EyeProducts />} />
+          <Route path="/product/makeup-products" element={<MakeupProducts />} />
         </Routes>
       </Router>
     </AuthProvider>

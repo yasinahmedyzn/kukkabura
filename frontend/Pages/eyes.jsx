@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Heart, ShoppingCart } from "lucide-react";
 
-const MakeupProducts = () => {
+const EyeProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -13,7 +13,7 @@ const MakeupProducts = () => {
         const res = await axios.get(
           `${import.meta.env.VITE_API_URL}/api/products/all/products`,
           {
-            params: { category: "makeup" }, // 👈 Only fetch Eye products
+            params: { category: "eye" }, // 👈 Only fetch Eye products
           }
         );
         setProducts(res.data.products || []);
@@ -32,7 +32,7 @@ const MakeupProducts = () => {
     <div className="container mx-auto px-4 py-4 max-w-6xl">
       {/* Top Bar */}
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-sm sm:text-lg font-semibold text-gray-800 mb-1">Makeup Products</h2>
+        <h2 className="text-sm sm:text-lg font-semibold text-gray-800 mb-1">Eye Products</h2>
         <p className="text-sm text-gray-600">
           {loading
             ? "Loading..."
@@ -103,7 +103,7 @@ const MakeupProducts = () => {
           })
         ) : (
           <p className="text-sm text-gray-500">
-            {loading ? "Loading..." : "No Makeup products available"}
+            {loading ? "Loading..." : "No Eye products available"}
           </p>
         )}
       </div>
@@ -111,4 +111,4 @@ const MakeupProducts = () => {
   );
 };
 
-export default MakeupProducts;
+export default EyeProducts;

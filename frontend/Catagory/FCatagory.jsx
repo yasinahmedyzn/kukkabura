@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { FaBrush, FaSmile, FaEye, FaBaby, FaGift, FaTshirt, FaHatCowboy, FaShoePrints } from "react-icons/fa";
 import { GiComb, GiLipstick, GiHairStrands, GiWatch, GiNecklaceDisplay, GiSunglasses } from "react-icons/gi";
 import { MdMasks } from "react-icons/md";
 import { TbToolsKitchen2 } from "react-icons/tb";
-import { useMediaQuery } from "react-responsive"; 
+import { useMediaQuery } from "react-responsive";
+import { motion, AnimatePresence } from "framer-motion";
 
 const categories = [
   { name: "Giftbox", icon: <FaGift className="text-pink-500 w-6 h-6 sm:w-8 sm:h-8" /> },
@@ -24,9 +26,15 @@ const categories = [
   { name: "Sunglasses", icon: <GiSunglasses className="text-black w-6 h-6 sm:w-8 sm:h-8" /> },
 ];
 
+// helper to convert name to URL-friendly slug
+const toSlug = (name) => name.toLowerCase().replace(/ & /g, "-").replace(/ /g, "-");
+
 export default function FeaturedCategories() {
   const isMobile = useMediaQuery({ maxWidth: 640 });
-  const visibleCategories = isMobile ? categories.slice(0, 9) : categories;
+  const [showAll, setShowAll] = useState(false);
+
+  const initialCategories = isMobile ? categories.slice(0, 9) : categories;
+  const extraCategories = isMobile ? categories.slice(9) : [];
 
   return (
     <div className="bg-white py-6">
@@ -38,31 +46,61 @@ export default function FeaturedCategories() {
           Shop Your Desired Product from Featured Category
         </p>
 
+        {/* Grid layout */}
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2 sm:gap-3">
-          {visibleCategories.map((cat, index) => (
-            <div
+          {initialCategories.map((cat, index) => (
+            <Link
               key={index}
+              to={`/product/${toSlug(cat.name)}-products`}
               className="flex flex-col items-center justify-center p-2 sm:p-4 border border-gray-300 rounded-md bg-white shadow-sm hover:shadow-md transition duration-200"
             >
-              {/* Hover effect on icon */}
               <div className="mb-1 sm:mb-2 transform transition duration-300 hover:scale-125">
                 {cat.icon}
               </div>
               <p className="text-[9px] sm:text-xs text-center text-gray-800 font-medium">
                 {cat.name}
               </p>
-            </div>
+            </Link>
           ))}
+
+          {/* AnimatePresence for extra categories */}
+          <AnimatePresence>
+            {showAll &&
+              extraCategories.map((cat, index) => (
+                <motion.div
+                  key={cat.name}
+                  initial={{ opacity: 0, y: -20, rotateX: -90 }}
+                  animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                  exit={{ opacity: 0, y: -20, rotateX: -90 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                >
+                  <Link
+                    to={`/product/${toSlug(cat.name)}-products`}
+                    className="flex flex-col items-center justify-center p-2 sm:p-4 border border-gray-300 rounded-md bg-white shadow-sm hover:shadow-md"
+                  >
+                    <div className="mb-1 sm:mb-2 transform transition duration-300 hover:scale-125">
+                      {cat.icon}
+                    </div>
+                    <p className="text-[9px] sm:text-xs text-center text-gray-800 font-medium">
+                      {cat.name}
+                    </p>
+                  </Link>
+                </motion.div>
+              ))}
+          </AnimatePresence>
         </div>
 
-        <div className="mt-5 text-center">
-          <a
-            href="#"
-            className="text-blue-600 text-xs sm:text-sm font-semibold hover:underline"
-          >
-            View All
-          </a>
-        </div>
+        {/* Mobile: View More / Show Less */}
+        {isMobile && (
+          <div className="mt-5 text-center">
+            <button
+              onClick={() => setShowAll(!showAll)}
+              className="text-sm text-gray-500 hover:text-gray-700 underline"
+            >
+              {showAll ? "Show Less" : "View More"}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

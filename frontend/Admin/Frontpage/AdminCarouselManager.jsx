@@ -71,8 +71,8 @@ export default function AdminCarouselDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center">
-      <div className="w-full max-w-3xl bg-white shadow p-3 rounded-lg mt-0">
+    <div className="bg-gray-100 flex justify-center py-8">
+      <div className="w-full max-w-3xl bg-white shadow p-2 md:p-3 rounded-lg">
         <h1 className="text-lg font-semibold text-center mb-4">
           🖼️ Carousel Manager
         </h1>

@@ -110,9 +110,9 @@ const Navbar = () => {
                   e.stopPropagation(); // prevent this toggle click from reaching document
                   setShowDropdown((s) => !s);
                 }}
-                className="flex items-center gap-1 text-sm font-bold text-black px-3 py-1 rounded-lg bg-white hover:shadow-md transition-all"
+                className="flex items-center gap-1 text-sm font-light text-black px-3 py-1 rounded-lg bg-white hover:shadow-md transition-all"
               >
-                <FaBars />
+                <FaBars className="w-3 h-3 text-gray-800 font-light" />
                 Categories
               </button>
 
@@ -262,7 +262,7 @@ const Navbar = () => {
               {[
                 { label: "Home", path: "/" },
                 { label: "Brand", path: "/Brand" },
-                { label: "Makeup", path: "/Makeup" },
+                { label: "Makeup", path: "/product/makeup-products" },
                 { label: "Fragnance", path: "/Fragnance" },
                 { label: "Sale & Offer", path: "/Sale&Offer" },
               ].map(({ label, path }) => (
@@ -367,10 +367,9 @@ const Navbar = () => {
             )}
 
             {/* Cart */}
-            {user && <>  <div>
+            <div>
               <nav className="flex items-center justify-between p-1 bg-white shadow">
                 {/* Other Navbar Content */}
-
                 <Link to="/cart" className="relative cursor-pointer">
                   <FaShoppingCart className="text-base" />
                   {cartCount > 0 && (
@@ -380,7 +379,7 @@ const Navbar = () => {
                   )}
                 </Link>
               </nav>
-            </div></>}
+            </div>
           </div>
         </div>
 
@@ -438,7 +437,7 @@ const Navbar = () => {
           {[
             { label: "Home", path: "/" },
             { label: "Brand", path: "/Brand" },
-            { label: "Makeup", path: "/Makeup" },
+            { label: "Makeup", path: "/product/makeup-products" },
             { label: "Fragnance", path: "/Fragnance" },
             { label: "Sale & Offer", path: "/Sale&Offer" },
           ].map(({ label, path }) => (

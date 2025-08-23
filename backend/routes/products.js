@@ -4,15 +4,16 @@ const router = express.Router();
 const TopProduct = require("../models/TopProduct");
 const DiscountProduct = require("../models/DiscountProducts");
 const NewProduct = require("../models/NewProduct");
-
+const AddProduct = require("../models/AddProduct");
 // ✅ Get all categories
 router.get("/all/categories", async (req, res) => {
   try {
     const top = await TopProduct.distinct("category");
     const discount = await DiscountProduct.distinct("category");
     const newP = await NewProduct.distinct("category");
+    const addP = await AddProduct.distinct("category");
 
-    const categories = [...new Set([...top, ...discount, ...newP])];
+    const categories = [...new Set([...top, ...discount, ...newP, ...addP])];
     res.json({ categories });
   } catch (error) {
     res.status(500).json({ message: "Error fetching categories", error });
@@ -25,8 +26,9 @@ router.get("/all/brands", async (req, res) => {
     const top = await TopProduct.distinct("brand");
     const discount = await DiscountProduct.distinct("brand");
     const newP = await NewProduct.distinct("brand");
+    const addP = await AddProduct.distinct("category");
 
-    const brands = [...new Set([...top, ...discount, ...newP])];
+    const brands = [...new Set([...top, ...discount, ...newP, ...addP])];
     res.json({ brands });
   } catch (error) {
     res.status(500).json({ message: "Error fetching brands", error });
@@ -55,8 +57,9 @@ router.get("/all/products", async (req, res) => {
     const top = (await TopProduct.find(filter)).map(p => ({ ...p._doc, type: "Top Product" }));
     const discount = (await DiscountProduct.find(filter)).map(p => ({ ...p._doc, type: "Discount Product" }));
     const newP = (await NewProduct.find(filter)).map(p => ({ ...p._doc, type: "New Product" }));
+    const addP = (await AddProduct.find(filter)).map(p => ({ ...p._doc, type: "Add Product" }));
 
-    let products = [...top, ...discount, ...newP];
+    let products = [...top, ...discount, ...newP, ...addP];
 
     // ✅ Sorting
     if (sort === "priceLowHigh") {
