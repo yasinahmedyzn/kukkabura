@@ -35,7 +35,7 @@ const carouselRoutes = require("./routes/carouselImages");
 app.use("/api/carousel-images", carouselRoutes);
 
 //add product routes
-const addProductsRoutes = require("./routes/addProduct.js");
+const addProductsRoutes = require("./routes/addProducts.js");
 app.use("/api/add-products", addProductsRoutes);
 
 //top product routes
