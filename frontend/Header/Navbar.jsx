@@ -125,16 +125,13 @@ const Navbar = () => {
                   <ul className="text-sm text-gray-800 font-medium">
                     {[
                       "Accessories",
-                      "Art & Collectibles",
                       "Baby",
                       "Bags & Purses",
                       "Bath & Beauty",
-                      "Books, Movies & Music",
-                      "Clothing",
-                      "Craft Supplies & Tools",
-                      "Electronics & Accessories",
-                      "Gifts",
-                      "Home & Living",
+                      "Makeup",
+                      "Face",
+                      "Lip",
+                      "Sunglasses",
                       "Jewelry",
                     ].map((item) => (
                       <li
@@ -409,16 +406,13 @@ const Navbar = () => {
             <ul className="text-sm">
               {[
                 "Accessories",
-                "Art & Collectibles",
                 "Baby",
                 "Bags & Purses",
                 "Bath & Beauty",
-                "Books, Movies & Music",
-                "Clothing",
-                "Craft Supplies & Tools",
-                "Electronics & Accessories",
-                "Gifts",
-                "Home & Living",
+                "Makeup",
+                "Face",
+                "Lip",
+                "Sunglasses",
                 "Jewelry",
               ].map((item) => (
                 <li
