@@ -10,10 +10,12 @@ const CategoryProducts = () => {
   const [selectedBrand, setSelectedBrand] = useState("");
   const [sort, setSort] = useState("latest");
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
 
   // price slider state
   const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(10000);
+  const [maxPrice, setMaxPrice] = useState(50000);
 
   // brand dropdown
   const [brandOpen, setBrandOpen] = useState(false);
@@ -51,10 +53,13 @@ const CategoryProducts = () => {
               sort,
               minPrice,
               maxPrice,
+              page,
+              limit: 12,
             },
           }
         );
         setProducts(res.data.products || []);
+        setTotal(res.data.total || 0);  // ✅ store total products found
       } catch (error) {
         console.error("Error fetching products", error);
         setProducts([]);
@@ -63,7 +68,7 @@ const CategoryProducts = () => {
       }
     };
     fetchProducts();
-  }, [selectedCategory, selectedBrand, sort, minPrice, maxPrice]);
+  }, [selectedCategory, selectedBrand, sort, minPrice, maxPrice, page]);
 
   return (
     <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row gap-4 max-w-6xl">
@@ -136,8 +141,8 @@ const CategoryProducts = () => {
             <div
               className="absolute top-1/2 -translate-y-1/2 h-[2px] bg-red-300 rounded"
               style={{
-                left: `${(minPrice / 10000) * 100}%`,
-                right: `${100 - (maxPrice / 10000) * 100}%`,
+                left: `${(minPrice / 50000) * 100}%`,
+                right: `${100 - (maxPrice / 50000) * 100}%`,
               }}
             ></div>
 
@@ -145,7 +150,7 @@ const CategoryProducts = () => {
             <input
               type="range"
               min="0"
-              max="10000"
+              max="50000"
               step="100"
               value={minPrice}
               onChange={(e) => {
@@ -165,7 +170,7 @@ const CategoryProducts = () => {
             <input
               type="range"
               min="0"
-              max="10000"
+              max="50000"
               step="100"
               value={maxPrice}
               onChange={(e) => {
@@ -202,7 +207,9 @@ const CategoryProducts = () => {
         {/* Top bar with sort + product count */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2 sm:gap-0">
           <p className="text-sm text-gray-600">
-            {loading ? "Loading..." : `${products.length} product${products.length !== 1 ? "s" : ""} found`}
+            {loading
+              ? "Loading..."
+              : `Showing ${(page - 1) * 12 + 1}–${Math.min(page * 12, total)} of ${total} results`}
           </p>
           <select
             value={sort}
@@ -272,6 +279,28 @@ const CategoryProducts = () => {
           ) : (
             <p className="text-sm text-gray-500">{loading ? "Loading..." : "No products available"}</p>
           )}
+        </div>
+        {/* Pagination */}
+        <div className="flex justify-center mt-6 gap-2">
+          <button
+            onClick={() => setPage((p) => Math.max(p - 1, 1))}
+            disabled={page === 1}
+            className="px-2.5 py-1 text-xs sm:text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition"
+          >
+            ◀ Prev
+          </button>
+
+          <span className="px-2 text-xs sm:text-sm text-gray-600 font-medium">
+            Page {page} of {Math.ceil(total / 12)}
+          </span>
+
+          <button
+            onClick={() => setPage((p) => (p < Math.ceil(total / 12) ? p + 1 : p))}
+            disabled={page >= Math.ceil(total / 12)}
+            className="px-2.5 py-1 text-xs sm:text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition"
+          >
+            Next ▶
+          </button>
         </div>
       </main>
     </div>

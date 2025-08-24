@@ -8,7 +8,7 @@ const callouts = [
       "https://www.bellobello.my/wp-content/uploads/2022/08/boldlipessentials-2.jpg",
     imageAlt:
       "Desk with leather desk pad, walnut desk organizer, wireless keyboard and mouse, and porcelain mug.",
-    href: "/Desk",
+    href: "/product/skincare-products",
   },
   {
     name: "Hair Care",
@@ -17,7 +17,7 @@ const callouts = [
       "https://www.hkvitals.com/blog/wp-content/uploads/2023/08/900-29.jpg",
     imageAlt:
       "Wood table with porcelain mug, leather journal, brass pen, leather key ring, and a houseplant.",
-    href: "/Self",
+    href: "/product/haircare-products",
   },
   {
     name: "Tools & Brushes",
@@ -26,7 +26,7 @@ const callouts = [
       "https://cdn.thewirecutter.com/wp-content/media/2024/10/makeupbrushes-2048px-01010-2x1-1.jpg?width=2048&quality=75&crop=2:1&auto=webp",
     imageAlt:
       "Collection of four insulated travel bottles on wooden shelf.",
-    href: "/Travel",
+    href: "/product/tools-brushes-products",
   },
   {
     name: "Bath & Body",
@@ -35,7 +35,7 @@ const callouts = [
       "https://media.istockphoto.com/id/1546442230/photo/front-view-skin-care-products-on-wooden-decorative-piece.jpg?s=612x612&w=0&k=20&c=4qEsfqeNNAcrlzZOwMjs9mZzPBUf1ey22v0gSjt7NcY=",
     imageAlt:
       "Collection of four insulated travel bottles on wooden shelf.",
-    href: "/Travel",
+    href: "/product/bath&body-products",
   },
 ];
 

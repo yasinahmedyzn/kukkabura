@@ -12,6 +12,12 @@ import CategoryPage from "../Catagory/CategoryPage.jsx";
 import EyeProducts from "../Pages/eyes.jsx";
 import MakeupProducts from "../Pages/Makeup.jsx";
 import FragnanceProducts from "../Pages/Fragnance.jsx";
+import SkincareProducts from "../Pages/Skincare.jsx";
+import HaircareProducts from "../Pages/Haircare.jsx";
+import ToolsBrushProducts from "../Pages/ToolsBrush.jsx";
+import BathBodyProducts from "../Pages/BathBody.jsx";
+import FaceProducts from "../Pages/Face.jsx";
+import LipProducts from "../Pages/Lip.jsx";
 
 function App() {
   return (
@@ -27,8 +33,14 @@ function App() {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/product" element={<CategoryPage />} />
           <Route path="/product/eyes-products" element={<EyeProducts />} />
+          <Route path="/product/face-products" element={<FaceProducts />} />
+           <Route path="/product/lip-products" element={<LipProducts />} />
           <Route path="/product/makeup-products" element={<MakeupProducts />} />
           <Route path="/product/fragnance-products" element={<FragnanceProducts />} />
+          <Route path="/product/skincare-products" element={<SkincareProducts />} />
+          <Route path="/product/haircare-products" element={<HaircareProducts />} />
+           <Route path="/product/tools-brushes-products" element={<ToolsBrushProducts />} />
+           <Route path="/product/bath&body-products" element={<BathBodyProducts />} />
         </Routes>
       </Router>
     </AuthProvider>
