@@ -47,9 +47,8 @@ export default function TopSellingProduct() {
     setFavorites(newFavorites);
   };
 
-  // ✅ Pass full product object (not just productId)
-  const handleAddToCart = async (product) => {
-    await addToCart(product, 1);
+  const handleAddToCart = async (productId) => {
+    await addToCart(productId, 1);
     setToast("Item added to cart successfully!");
     setTimeout(() => setToast(null), 2000);
   };
@@ -98,7 +97,7 @@ export default function TopSellingProduct() {
                 onHover={() => setHoveredProduct(product._id)}
                 onLeave={() => setHoveredProduct(null)}
                 onToggleFavorite={() => toggleFavorite(product._id)}
-                onAddToCart={() => handleAddToCart(product)} // ✅ fixed
+                onAddToCart={() => handleAddToCart(product._id)}
               />
             </div>
           ))}
@@ -108,15 +107,7 @@ export default function TopSellingProduct() {
   );
 }
 
-function ProductCard({
-  product,
-  isHovered,
-  isFavorite,
-  onHover,
-  onLeave,
-  onToggleFavorite,
-  onAddToCart,
-}) {
+function ProductCard({ product, isHovered, isFavorite, onHover, onLeave, onToggleFavorite, onAddToCart }) {
   const [hoverCart, setHoverCart] = useState(false);
 
   return (
@@ -132,11 +123,7 @@ function ProductCard({
         }}
         className="absolute top-2 right-2 z-10 p-1 rounded-full hover:bg-gray-100 transition-colors"
       >
-        <Heart
-          className={`w-4 h-4 ${
-            isFavorite ? "fill-red-500 text-red-500" : "text-gray-400 hover:text-red-500"
-          }`}
-        />
+        <Heart className={`w-4 h-4 ${isFavorite ? "fill-red-500 text-red-500" : "text-gray-400 hover:text-red-500"}`} />
       </button>
 
       <div className="relative mb-3">
@@ -144,17 +131,13 @@ function ProductCard({
           <img
             src={product.imageUrl}
             alt={product.name}
-            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${
-              isHovered ? "opacity-0" : "opacity-100"
-            }`}
+            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${isHovered ? "opacity-0" : "opacity-100"}`}
           />
           {product.hoverImageUrl && (
             <img
               src={product.hoverImageUrl}
               alt={`${product.name} - alternate view`}
-              className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${
-                isHovered ? "opacity-100" : "opacity-0"
-              }`}
+              className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-0"}`}
             />
           )}
         </div>
@@ -162,26 +145,21 @@ function ProductCard({
 
       <div className="space-y-1">
         <p className="text-xs font-medium text-gray-900">{product.brand}</p>
-        <h3 className="text-xs md:text-sm text-gray-700 line-clamp-2 leading-tight">
-          {product.name}
-        </h3>
+        <h3 className="text-xs md:text-sm text-gray-700 line-clamp-2 leading-tight">{product.name}</h3>
 
         <div className="flex items-center justify-between pt-2">
           <span className="text-sm font-semibold text-red-600">৳ {product.price}</span>
           <button
             onMouseEnter={() => setHoverCart(true)}
             onMouseLeave={() => setHoverCart(false)}
-            onTouchStart={() => setHoverCart(true)} // Mobile
-            onTouchEnd={() => setHoverCart(false)} // Mobile
+            onTouchStart={() => setHoverCart(true)}   // Mobile
+            onTouchEnd={() => setHoverCart(false)}    // Mobile
             onClick={(e) => {
               e.stopPropagation();
               onAddToCart();
             }}
-            className={`p-1.5 rounded-md transition-colors ${
-              hoverCart
-                ? "bg-red-500 text-white"
-                : "bg-gray-900 text-white hover:bg-gray-800"
-            }`}
+            className={`p-1.5 rounded-md transition-colors ${hoverCart ? "bg-red-500 text-white" : "bg-gray-900 text-white hover:bg-gray-800"
+              }`}
           >
             <ShoppingCart className="w-3 h-3" />
           </button>
