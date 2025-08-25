@@ -6,14 +6,16 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 const CartPage = () => {
   const { items, loading, fetchCart, updateQty, remove, clearCart } = useCart();
 
+  // Fetch cart on mount
   useEffect(() => {
     fetchCart();
   }, []);
 
-  const subtotal = items.reduce(
-    (sum, item) => sum + (item.productId?.price || 0) * item.quantity,
-    0
-  );
+  // Calculate subtotal
+  const subtotal = items.reduce((sum, item) => {
+    const product = item.product || item.productId; // guest or logged-in
+    return sum + (product?.price || 0) * item.quantity;
+  }, 0);
 
   if (loading)
     return <p className="text-center mt-10 text-gray-500">Loading cart...</p>;
@@ -38,12 +40,15 @@ const CartPage = () => {
       {/* Cart Items */}
       <div className="space-y-4">
         {items.map((item) => {
-          const product = item.productId;
-          if (!product) return null; // skip if product was deleted
+          const product = item.product || item.productId;
+          if (!product) return null;
+
+          // Use a unique key for guests
+          const key = item._id || `guest-${product._id}`;
 
           return (
             <div
-              key={item._id || product._id}
+              key={key}
               className="flex flex-col md:flex-row justify-between items-center border rounded-lg p-4 shadow-sm bg-white"
             >
               {/* Product Info */}
