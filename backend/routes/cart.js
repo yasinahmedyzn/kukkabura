@@ -6,16 +6,19 @@ const Cart = require("../models/Cart");
 const TopProduct = require("../models/TopProduct");
 const NewProduct = require("../models/NewProduct");
 const DiscountProduct = require("../models/DiscountProducts");
+const AddProduct = require("../models/AddProduct"); // ✅ Include AddProduct
 
 // Helper: populate product from multiple collections
 const populateProduct = async (productId) => {
-  let product = await TopProduct.findById(productId);
-  if (!product) product = await NewProduct.findById(productId);
-  if (!product) product = await DiscountProduct.findById(productId);
+  let product =
+    (await TopProduct.findById(productId)) ||
+    (await NewProduct.findById(productId)) ||
+    (await DiscountProduct.findById(productId)) ||
+    (await AddProduct.findById(productId));
   return product;
 };
 
-// 📌 Get current user's cart
+// -------------------- GET CART --------------------
 router.get("/", verifyToken, async (req, res) => {
   try {
     const cart = await Cart.findOne({ userId: req.user.id });
@@ -24,7 +27,7 @@ router.get("/", verifyToken, async (req, res) => {
     const itemsWithProduct = await Promise.all(
       cart.items.map(async (item) => {
         const product = await populateProduct(item.productId);
-        return { ...item._doc, productId: product }; // Replace productId with full product
+        return { ...item._doc, productId: product };
       })
     );
 
@@ -35,7 +38,7 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
-// 📌 Add product to cart (or increase quantity)
+// -------------------- ADD TO CART --------------------
 router.post("/", verifyToken, async (req, res) => {
   const { productId, quantity = 1 } = req.body;
 
@@ -58,7 +61,6 @@ router.post("/", verifyToken, async (req, res) => {
 
     await cart.save();
 
-    // Populate items after saving
     const updatedCart = await Cart.findOne({ userId: req.user.id });
     const itemsWithProduct = await Promise.all(
       updatedCart.items.map(async (item) => {
@@ -74,13 +76,13 @@ router.post("/", verifyToken, async (req, res) => {
   }
 });
 
-// 📌 Update quantity of a product
+// -------------------- UPDATE QUANTITY --------------------
 router.put("/:productId", verifyToken, async (req, res) => {
   const { productId } = req.params;
   const { quantity } = req.body;
 
   try {
-    let cart = await Cart.findOne({ userId: req.user.id });
+    const cart = await Cart.findOne({ userId: req.user.id });
     if (!cart) return res.status(404).json({ message: "Cart not found" });
 
     const itemIndex = cart.items.findIndex(
@@ -111,7 +113,7 @@ router.put("/:productId", verifyToken, async (req, res) => {
   }
 });
 
-// 📌 Remove a single item from cart
+// -------------------- REMOVE SINGLE ITEM --------------------
 router.delete("/:productId", verifyToken, async (req, res) => {
   try {
     const cart = await Cart.findOne({ userId: req.user.id });
@@ -138,7 +140,7 @@ router.delete("/:productId", verifyToken, async (req, res) => {
   }
 });
 
-// 📌 Clear entire cart
+// -------------------- CLEAR CART --------------------
 router.delete("/", verifyToken, async (req, res) => {
   try {
     await Cart.findOneAndDelete({ userId: req.user.id });

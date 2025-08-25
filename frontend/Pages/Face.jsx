@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Heart, ShoppingCart } from "lucide-react";
+import { useAddToCart } from "../src/hooks/useAddToCart"; // ✅ import custom hook
+import LoginModal from "../Auth/loginForm";           // ✅ import login modal
 
 const FaceProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // ✅ Reusable add-to-cart logic
+  const { toast, showLogin, setShowLogin, handleAddToCart, handleLoginSuccess } = useAddToCart();
 
   useEffect(() => {
     const fetchFaceProducts = async () => {
@@ -13,7 +18,7 @@ const FaceProducts = () => {
         const res = await axios.get(
           `${import.meta.env.VITE_API_URL}/api/products/all/products`,
           {
-            params: { category: "face" }, // 👈 Only fetch Face products
+            params: { category: "face" }, // Fetch only face products
           }
         );
         setProducts(res.data.products || []);
@@ -30,9 +35,26 @@ const FaceProducts = () => {
 
   return (
     <div className="container mx-auto px-4 py-4 max-w-6xl">
+      {/* ✅ Toast notification */}
+      {toast && (
+        <div className="fixed top-5 right-5 bg-green-500 text-white px-4 py-2 rounded shadow-md z-50">
+          {toast}
+        </div>
+      )}
+
+      {/* ✅ Login Modal */}
+      {showLogin && (
+        <LoginModal
+          onClose={() => setShowLogin(false)}
+          onLoginSuccess={handleLoginSuccess}
+        />
+      )}
+
       {/* Top Bar */}
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-sm sm:text-lg font-semibold text-gray-800 mb-1">Face Products</h2>
+        <h2 className="text-sm sm:text-lg font-semibold text-gray-800 mb-1">
+          Face Products
+        </h2>
         <p className="text-sm text-gray-600">
           {loading
             ? "Loading..."
@@ -95,7 +117,10 @@ const FaceProducts = () => {
                 </div>
 
                 {/* Cart Icon */}
-                <button className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 bg-black text-white p-1 rounded">
+                <button
+                  className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 bg-black text-white p-1 rounded hover:bg-gray-800"
+                  onClick={() => handleAddToCart(p._id)} // ✅ Add to cart
+                >
                   <ShoppingCart size={12} />
                 </button>
               </div>

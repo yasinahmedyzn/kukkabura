@@ -1,17 +1,24 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { Link } from "react-router-dom";
 import { Heart, ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
+import { AuthContext } from "../src/context/AuthContext";
 import { useCart } from "../src/context/CartContext";
+import LoginModal from "../Auth/loginmodal";
+import "./styles.css";
 
-export default function Newarrival() {
+export default function NewArrival() {
   const [products, setProducts] = useState([]);
   const [hoveredProduct, setHoveredProduct] = useState(null);
   const [favorites, setFavorites] = useState(new Set());
   const [toast, setToast] = useState(null);
+  const [showLogin, setShowLogin] = useState(false);
+  const [pendingProductId, setPendingProductId] = useState(null);
+
   const scrollContainerRef = useRef(null);
   const { addToCart } = useCart();
+  const { user } = useContext(AuthContext);
 
   const productsPerPageDesktop = 5;
   const productsPerPageMobile = 2;
@@ -24,7 +31,7 @@ export default function Newarrival() {
         const data = await res.json();
         setProducts(data);
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error(error);
       }
     };
     fetchProducts();
@@ -47,6 +54,12 @@ export default function Newarrival() {
   };
 
   const handleAddToCart = async (productId) => {
+    if (!user) {
+      setPendingProductId(productId);
+      setShowLogin(true);
+      return;
+    }
+
     await addToCart(productId, 1);
     setToast("Item added to cart successfully!");
     setTimeout(() => setToast(null), 2000);
@@ -55,23 +68,37 @@ export default function Newarrival() {
   return (
     <div className="w-full max-w-7xl mx-auto px-4 py-6 relative">
       {toast && (
-        <div className="fixed top-5 right-5 bg-green-500 text-white px-4 py-2 rounded shadow-md z-50 transition-all">
+        <div className="fixed top-5 right-5 bg-green-500 text-white px-4 py-2 rounded shadow-md z-50">
           {toast}
         </div>
+      )}
+
+      {showLogin && (
+        <LoginModal
+          onClose={() => setShowLogin(false)}
+          onLoginSuccess={async () => {
+            setShowLogin(false);
+            if (pendingProductId) {
+              await addToCart(pendingProductId, 1);
+              setToast("Item added to cart successfully!");
+              setPendingProductId(null);
+              setTimeout(() => setToast(null), 2000);
+            }
+          }}
+        />
       )}
 
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-base sm:text-xl font-bold text-gray-800 mb-3">
           New Arrival Product
         </h2>
-         <Link to="/product" className="text-sm text-gray-600 hover:text-gray-900 underline">
+        <Link to="/product" className="text-sm text-gray-600 hover:text-gray-900 underline">
           View all
         </Link>
       </div>
 
       <button
         onClick={() => scrollByPage(-1)}
-        aria-label="Scroll left"
         className="hidden md:flex absolute top-1/2 left-2 -translate-y-1/2 z-20 bg-white border border-gray-300 rounded-full p-2 shadow hover:bg-gray-100"
       >
         <ChevronLeft className="w-5 h-5 text-gray-700" />
@@ -79,7 +106,6 @@ export default function Newarrival() {
 
       <button
         onClick={() => scrollByPage(1)}
-        aria-label="Scroll right"
         className="hidden md:flex absolute top-1/2 right-2 -translate-y-1/2 z-20 bg-white border border-gray-300 rounded-full p-2 shadow hover:bg-gray-100"
       >
         <ChevronRight className="w-5 h-5 text-gray-700" />
@@ -116,10 +142,7 @@ function ProductCard({ product, isHovered, isFavorite, onHover, onLeave, onToggl
       onMouseLeave={onLeave}
     >
       <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onToggleFavorite();
-        }}
+        onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
         className="absolute top-2 right-2 z-10 p-1 rounded-full hover:bg-gray-100 transition-colors"
       >
         <Heart className={`w-4 h-4 ${isFavorite ? "fill-red-500 text-red-500" : "text-gray-400 hover:text-red-500"}`} />
@@ -151,15 +174,10 @@ function ProductCard({ product, isHovered, isFavorite, onHover, onLeave, onToggl
           <button
             onMouseEnter={() => setHoverCart(true)}
             onMouseLeave={() => setHoverCart(false)}
-            onTouchStart={() => setHoverCart(true)}   // Mobile
-            onTouchEnd={() => setHoverCart(false)}    // Mobile
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddToCart();
-            }}
-            className={`p-1.5 rounded-md transition-colors ${
-              hoverCart ? "bg-red-500 text-white" : "bg-gray-900 text-white hover:bg-gray-800"
-            }`}
+            onTouchStart={() => setHoverCart(true)}
+            onTouchEnd={() => setHoverCart(false)}
+            onClick={(e) => { e.stopPropagation(); onAddToCart(); }}
+            className={`p-1.5 rounded-md transition-colors ${hoverCart ? "bg-red-500 text-white" : "bg-gray-900 text-white hover:bg-gray-800"}`}
           >
             <ShoppingCart className="w-3 h-3" />
           </button>
