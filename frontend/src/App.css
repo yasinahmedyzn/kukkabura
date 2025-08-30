@@ -6,3 +6,19 @@
   line-height: 7vh;
   margin-top: -6vh;
 }
+
+/* App.css */
+html, body, #root {
+  height: 100%;      /* full height of the screen */
+  margin: 0;         /* remove default margin */
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* full screen height */
+}
+
+main {
+  flex: 1;           /* take all remaining space to push footer down */
+}
