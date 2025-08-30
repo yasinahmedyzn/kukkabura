@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Heart, ShoppingCart } from "lucide-react";
-import { useAddToCart } from "../src/hooks/useAddToCart"; // ✅ import custom hook
-import LoginModal from "../Auth/loginForm";           // ✅ import login modal
+import { useAddToCart } from "../src/hooks/useAddToCart";
+import LoginModal from "../Auth/loginmodal";
 
 const FaceProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Reusable add-to-cart logic
-  const { toast, showLogin, setShowLogin, handleAddToCart, handleLoginSuccess } = useAddToCart();
+  const {
+    handleAddToCart,
+    toast,
+    showLogin,
+    setShowLogin,
+    handleLoginSuccess,
+  } = useAddToCart();
 
   useEffect(() => {
     const fetchFaceProducts = async () => {
@@ -18,7 +23,7 @@ const FaceProducts = () => {
         const res = await axios.get(
           `${import.meta.env.VITE_API_URL}/api/products/all/products`,
           {
-            params: { category: "face" }, // Fetch only face products
+            params: { category: "face" },
           }
         );
         setProducts(res.data.products || []);
@@ -35,14 +40,14 @@ const FaceProducts = () => {
 
   return (
     <div className="container mx-auto px-4 py-4 max-w-6xl">
-      {/* ✅ Toast notification */}
+      {/* Toast Notification */}
       {toast && (
         <div className="fixed top-5 right-5 bg-green-500 text-white px-4 py-2 rounded shadow-md z-50">
           {toast}
         </div>
       )}
 
-      {/* ✅ Login Modal */}
+      {/* Login Modal */}
       {showLogin && (
         <LoginModal
           onClose={() => setShowLogin(false)}
@@ -50,7 +55,7 @@ const FaceProducts = () => {
         />
       )}
 
-      {/* Top Bar */}
+      {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-sm sm:text-lg font-semibold text-gray-800 mb-1">
           Face Products
@@ -74,12 +79,12 @@ const FaceProducts = () => {
                 key={p._id}
                 className="relative bg-white rounded-md p-2 sm:p-3 hover:shadow transition"
               >
-                {/* Heart Icon */}
+                {/* Wishlist Icon */}
                 <button className="absolute top-1 right-1 sm:top-2 sm:right-2 text-gray-400 hover:text-red-500">
                   <Heart size={12} />
                 </button>
 
-                {/* Image */}
+                {/* Product Image */}
                 <img
                   src={defaultImage}
                   alt={p.name}
@@ -98,7 +103,7 @@ const FaceProducts = () => {
                   {p.name}
                 </p>
 
-                {/* Price */}
+                {/* Price Section */}
                 <div className="flex items-center gap-1 sm:gap-2 mt-1">
                   {p.discprice ? (
                     <>
@@ -116,10 +121,10 @@ const FaceProducts = () => {
                   )}
                 </div>
 
-                {/* Cart Icon */}
+                {/* Add to Cart */}
                 <button
+                  onClick={() => handleAddToCart(p._id)}
                   className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 bg-black text-white p-1 rounded hover:bg-gray-800"
-                  onClick={() => handleAddToCart(p._id)} // ✅ Add to cart
                 >
                   <ShoppingCart size={12} />
                 </button>

@@ -18,6 +18,7 @@ import ToolsBrushProducts from "../Pages/ToolsBrush.jsx";
 import BathBodyProducts from "../Pages/BathBody.jsx";
 import FaceProducts from "../Pages/Face.jsx";
 import LipProducts from "../Pages/Lip.jsx";
+import Profile from "../Auth/profile.jsx";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/registration" element={<Registration />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/success" element={<Success />} />
           <Route path="/admin-dashboard" element={<Admin_dashboard />} />
           <Route path="/cart" element={<CartPage />} />

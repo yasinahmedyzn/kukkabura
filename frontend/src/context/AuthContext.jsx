@@ -3,31 +3,39 @@ import React, { createContext, useState, useEffect } from "react";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // Holds the logged-in user
-  const [token, setToken] = useState(null); // Holds the JWT token
-
-  useEffect(() => {
+  const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("user");
-    const savedToken = localStorage.getItem("token");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
-    if (savedUser && savedToken) {
-      setUser(JSON.parse(savedUser));
-      setToken(savedToken);
+  const [token, setToken] = useState(() => {
+    return localStorage.getItem("token") || null;
+  });
+
+  // 🔄 Keep localStorage in sync whenever token or user changes
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
     }
-  }, []);
+
+    if (token) {
+      localStorage.setItem("token", token);
+    } else {
+      localStorage.removeItem("token");
+    }
+  }, [user, token]);
 
   const login = (userData, jwtToken) => {
-    localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("token", jwtToken);
     setUser(userData);
     setToken(jwtToken);
   };
 
   const logout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
     setUser(null);
     setToken(null);
+    localStorage.clear(); // clear everything on logout
   };
 
   return (
