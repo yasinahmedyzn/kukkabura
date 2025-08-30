@@ -13,17 +13,16 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
   const [error, setError] = useState("");
   const [animate, setAnimate] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => setAnimate(true), []);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
-  // LOGIN
+  // Handle Login
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
         method: "POST",
@@ -32,47 +31,47 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
       });
       const data = await res.json();
 
-      if (res.status === 404 || !res.ok) {
-        setError("No account found with this email. Please try again.");
+      if (!res.ok) {
+        setError(data.message || "Invalid credentials. Try again.");
         return;
       }
 
       login(data.user, data.token);
-      setSuccessMessage("Success!");
-      setShowConfetti(true);
-
+      setSuccessMessage("Welcome back!");
       setTimeout(() => {
-        setShowConfetti(false);
         setSuccessMessage("");
         onLoginSuccess();
-      }, 1000); // Shortened duration
-    } catch (err) {
+      }, 1200);
+    } catch {
       setError("Something went wrong. Please try again.");
     }
   };
 
-  // REGISTER
+  // Handle Registration
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
-
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/register`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        }
+      );
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Registration failed");
 
-      setSuccessMessage("Registered!");
+      if (!res.ok) {
+        throw new Error(data.message || "Registration failed");
+      }
+
+      setSuccessMessage("Registration successful!");
       setForm({ firstName: "", lastName: "", email: "", password: "" });
-
       setTimeout(() => {
         setSuccessMessage("");
         setIsRegister(false);
-      }, 1000); // Shortened duration
+      }, 1200);
     } catch (err) {
       setError(err.message);
     }
@@ -80,21 +79,21 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center items-center px-4 sm:px-0">
-      {/* Blurred Background */}
+      {/* Blurred Overlay */}
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-md transition-opacity"
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         onClick={onClose}
       ></div>
 
-      {/* Modal Box */}
+      {/* Modal Card */}
       <div
-        className={`relative w-full max-w-md p-6 sm:p-8 bg-white rounded-3xl shadow-2xl transform transition-all duration-300 ${
+        className={`relative w-full max-w-md p-6 sm:p-8 bg-white rounded-2xl shadow-2xl border border-gray-200 transform transition-all duration-300 ${
           animate ? "scale-100 opacity-100" : "scale-90 opacity-0"
         }`}
       >
         {/* Success Message */}
         {successMessage && (
-          <div className="flex justify-center items-center mb-6">
+          <div className="flex flex-col items-center mb-4">
             <div className="w-16 h-16 bg-green-500 rounded-full flex justify-center items-center shadow-md animate-ping-once">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -109,33 +108,42 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
                 />
               </svg>
             </div>
+            <p className="mt-3 text-lg font-semibold text-green-600">
+              {successMessage}
+            </p>
           </div>
         )}
 
         {!successMessage && (
           <>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2 text-center">
+            {/* Title */}
+            <h2 className="text-2xl font-bold text-center text-pink-600">
               {isRegister ? "Create Account" : "Welcome Back"}
             </h2>
             <p className="text-gray-500 text-sm text-center mb-4">
-              {isRegister ? "Sign up to start shopping" : "Login to continue shopping"}
+              {isRegister
+                ? "Sign up to join the beauty community ✨"
+                : "Login to continue shopping"}
             </p>
 
-            {error && <p className="text-red-500 text-sm mb-3 text-center">{error}</p>}
+            {error && (
+              <p className="text-red-500 text-sm mb-3 text-center">{error}</p>
+            )}
 
+            {/* Form */}
             <form
               onSubmit={isRegister ? handleRegister : handleLogin}
-              className="space-y-3 sm:space-y-4"
+              className="space-y-4"
             >
               {isRegister && (
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                <div className="flex gap-2">
                   <input
                     type="text"
                     placeholder="First Name"
                     name="firstName"
                     value={form.firstName}
                     onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"
+                    className="w-1/2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 shadow-sm"
                     required
                   />
                   <input
@@ -144,7 +152,7 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
                     name="lastName"
                     value={form.lastName}
                     onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"
+                    className="w-1/2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 shadow-sm"
                     required
                   />
                 </div>
@@ -156,7 +164,7 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
                 name="email"
                 value={form.email}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 shadow-sm"
                 required
               />
               <input
@@ -165,18 +173,19 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
                 name="password"
                 value={form.password}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 shadow-sm"
                 required
               />
 
               <button
                 type="submit"
-                className="w-full bg-red-500 text-white py-3 rounded-xl font-semibold hover:bg-red-600 transition"
+                className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-3 rounded-xl shadow-lg hover:shadow-pink-500/50 transition duration-300 font-semibold"
               >
                 {isRegister ? "Register" : "Login"}
               </button>
             </form>
 
+            {/* Switch Between Modes */}
             <p className="text-center text-sm text-gray-500 mt-3">
               {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
               <span
@@ -184,12 +193,13 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
                   setIsRegister(!isRegister);
                   setError("");
                 }}
-                className="text-red-500 font-semibold cursor-pointer hover:underline"
+                className="text-pink-600 font-semibold cursor-pointer hover:text-purple-600"
               >
                 {isRegister ? "Login" : "Register"}
               </span>
             </p>
 
+            {/* Cancel Button */}
             <button
               onClick={onClose}
               className="mt-3 w-full border border-gray-300 py-2 rounded-xl text-gray-600 hover:bg-gray-100 transition"
@@ -200,7 +210,7 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
         )}
       </div>
 
-      {/* Animations */}
+      {/* Animation Styles */}
       <style>{`
         @keyframes ping-once {
           0% { transform: scale(0.5); opacity: 0; }
@@ -209,13 +219,6 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
         }
         .animate-ping-once {
           animation: ping-once 0.8s ease-out forwards;
-        }
-        @keyframes confetti {
-          0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-          100% { transform: translateY(100px) rotate(360deg); opacity: 0; }
-        }
-        .animate-[confetti_1s_ease-in-out] {
-          animation: confetti 1s ease-in-out forwards;
         }
       `}</style>
     </div>

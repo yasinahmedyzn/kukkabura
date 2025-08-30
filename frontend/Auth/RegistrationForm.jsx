@@ -24,128 +24,94 @@ export default function Registration() {
       );
       alert(res.data.message);
 
-      // Clear form data
       setForm({
         firstName: "",
         lastName: "",
         email: "",
         password: "",
       });
-
-      // Optionally redirect after successful registration
-      // navigate("/login");
     } catch (error) {
       alert(error.response?.data?.message || "Something went wrong!");
     }
   };
 
   return (
-    <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
-          Create your account
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="w-full max-w-sm bg-white shadow-xl rounded-2xl p-8 border border-gray-200">
+        <h2 className="text-center text-3xl font-extrabold text-pink-600">
+          Create Your MeiGlow Account
         </h2>
-      </div>
+        <p className="text-center text-gray-500 mt-2 mb-6 text-sm">
+          Join the beauty community ✨
+        </p>
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="flex gap-4">
-            <div className="w-1/2">
-              <label
-                htmlFor="firstName"
-                className="block text-sm font-medium text-gray-900"
-              >
-                First Name
-              </label>
-              <div className="mt-2">
-                <input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  required
-                  value={form.firstName}
-                  onChange={handleChange}
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm"
-                />
-              </div>
-            </div>
-
-            <div className="w-1/2">
-              <label
-                htmlFor="lastName"
-                className="block text-sm font-medium text-gray-900"
-              >
-                Last Name
-              </label>
-              <div className="mt-2">
-                <input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  required
-                  value={form.lastName}
-                  onChange={handleChange}
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm"
-                />
-              </div>
-            </div>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Name Fields */}
+          <div className="flex gap-3">
+            <input
+              id="firstName"
+              name="firstName"
+              type="text"
+              placeholder="First Name"
+              value={form.firstName}
+              onChange={handleChange}
+              required
+              className="w-1/2 rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-pink-400 focus:outline-none"
+            />
+            <input
+              id="lastName"
+              name="lastName"
+              type="text"
+              placeholder="Last Name"
+              value={form.lastName}
+              onChange={handleChange}
+              required
+              className="w-1/2 rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-pink-400 focus:outline-none"
+            />
           </div>
 
+          {/* Email */}
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-900"
-            >
-              Email address
-            </label>
-            <div className="mt-2">
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={form.email}
-                onChange={handleChange}
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm"
-              />
-            </div>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="Email address"
+              value={form.email}
+              onChange={handleChange}
+              required
+              className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-pink-400 focus:outline-none"
+            />
           </div>
 
+          {/* Password */}
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-900"
-            >
-              Password
-            </label>
-            <div className="mt-2">
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                value={form.password}
-                onChange={handleChange}
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm"
-              />
-            </div>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleChange}
+              required
+              className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-pink-400 focus:outline-none"
+            />
           </div>
 
-          <div>
-            <button
-              type="submit"
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow hover:bg-indigo-500 focus:outline-indigo-600"
-            >
-              Register
-            </button>
-          </div>
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-3 rounded-xl shadow-lg hover:shadow-pink-500/50 transition duration-300 font-semibold"
+          >
+            Register
+          </button>
         </form>
 
-        <p className="mt-10 text-center text-sm text-gray-500">
+        <p className="mt-6 text-center text-sm text-gray-600">
           Already have an account?{" "}
           <Link
             to="/login"
-            className="font-semibold text-indigo-600 hover:text-indigo-500"
+            className="font-semibold text-pink-600 hover:text-purple-600"
           >
             Sign in
           </Link>

@@ -13,33 +13,23 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/auth/login`,
-        {
-          email,
-          password,
-        }
+        { email, password }
       );
 
       const userData = res.data.user;
       const jwtToken = res.data.token;
 
-      // ✅ Save to localStorage
       localStorage.setItem("token", jwtToken);
       localStorage.setItem("user", JSON.stringify(userData));
 
-      login(userData, jwtToken); // ✅ Set in context
-
+      login(userData, jwtToken);
       setMessage(res.data.message || "Login successful");
 
       setTimeout(() => {
-        if (userData.role === "admin") {
-          navigate("/admin-dashboard");
-        } else {
-          navigate("/success");
-        }
+        navigate(userData.role === "admin" ? "/admin-dashboard" : "/");
       }, 1000);
     } catch (error) {
       setMessage(error.response?.data?.message || "Login failed: Server error");
@@ -47,76 +37,58 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col justify-center px-6 py-12 bg-gray-50">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
-          Sign in to your account
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      {/* Login Card */}
+      <div className="w-full max-w-sm bg-white shadow-xl rounded-2xl p-8 border border-gray-200">
+        <h2 className="text-center text-3xl font-extrabold text-pink-600">
+          Sign in to MeiGlow
         </h2>
-      </div>
+        <p className="text-center text-gray-500 mt-2 mb-6 text-sm">
+          Beauty starts with your account ✨
+        </p>
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Email address
-            </label>
-            <div className="mt-2">
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm"
-              />
-            </div>
+            <input
+              type="email"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-pink-400 focus:outline-none"
+            />
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
-            <div className="mt-2">
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm"
-              />
-            </div>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-pink-400 focus:outline-none"
+            />
           </div>
 
-          <div>
-            <button
-              type="submit"
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-600"
-            >
-              Sign in
-            </button>
-          </div>
+          <button
+            type="submit"
+            className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-3 rounded-xl shadow-lg hover:shadow-pink-500/50 transition duration-300 font-semibold"
+          >
+            Sign In
+          </button>
         </form>
 
         {message && (
-          <p className="mt-4 text-center text-indigo-700 font-medium">
+          <p className="mt-4 text-center text-pink-700 font-medium">
             {message}
           </p>
         )}
 
-        <p className="mt-10 text-center text-sm text-gray-500">
+        <p className="mt-6 text-center text-sm text-gray-600">
           Not a member?{" "}
           <Link
             to="/registration"
-            className="font-semibold text-indigo-600 hover:text-indigo-500"
+            className="font-semibold text-pink-600 hover:text-purple-600"
           >
             Register now
           </Link>

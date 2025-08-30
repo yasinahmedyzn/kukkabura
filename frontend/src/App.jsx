@@ -4,7 +4,6 @@ import Navbar from "../Header/Navbar";
 import HomePage from "../Pages/Home";
 import Login from "../Auth/loginForm";
 import Registration from "../Auth/RegistrationForm";
-import Success from "../Auth/success";
 import Admin_dashboard from "../Auth/admindashboard";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import CartPage from "../Pages/CartPage.jsx";
@@ -30,19 +29,18 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/registration" element={<Registration />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/success" element={<Success />} />
           <Route path="/admin-dashboard" element={<Admin_dashboard />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/product" element={<CategoryPage />} />
           <Route path="/product/eyes-products" element={<EyeProducts />} />
           <Route path="/product/face-products" element={<FaceProducts />} />
-           <Route path="/product/lip-products" element={<LipProducts />} />
+          <Route path="/product/lip-products" element={<LipProducts />} />
           <Route path="/product/makeup-products" element={<MakeupProducts />} />
           <Route path="/product/fragnance-products" element={<FragnanceProducts />} />
           <Route path="/product/skincare-products" element={<SkincareProducts />} />
           <Route path="/product/haircare-products" element={<HaircareProducts />} />
-           <Route path="/product/tools-brushes-products" element={<ToolsBrushProducts />} />
-           <Route path="/product/bath&body-products" element={<BathBodyProducts />} />
+          <Route path="/product/tools-brushes-products" element={<ToolsBrushProducts />} />
+          <Route path="/product/bath&body-products" element={<BathBodyProducts />} />
         </Routes>
       </Router>
     </AuthProvider>
