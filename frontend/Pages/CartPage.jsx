@@ -143,13 +143,23 @@ const CartPage = () => {
         <div className="mt-4 flex flex-col space-y-2">
           <button
             onClick={handleProceedToPay}
-            className="bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition"
+            className="bg-green-500 text-white py-2 rounded-lg 
+             hover:bg-green-600 
+             active:bg-green-700 
+             active:scale-95 
+             transition duration-150 ease-in-out 
+             transform focus:outline-none w-full"
           >
             Proceed to Checkout
           </button>
           <button
             onClick={clearCart}
-            className="bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition"
+            className="bg-green-500 text-white py-2 rounded-lg 
+             hover:bg-green-600 
+             active:bg-green-700 
+             active:scale-95 
+             transition duration-150 ease-in-out 
+             transform focus:outline-none w-full"
           >
             Clear Cart
           </button>
