@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const bodyParser = require('body-parser');
 const connectDB = require("./config/db");
 
 
@@ -13,6 +14,7 @@ app.use(cors({
   origin: '*', // allow all origins
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }));
+app.use(bodyParser.json());
 
 
 // Connect to DB
@@ -57,6 +59,10 @@ app.use("/api/cart", cartRoutes);
 //product fetch
 const productRoutes = require("./routes/products");
 app.use("/api/products", productRoutes);
+
+//payment route
+const paymentRoute = require('./routes/payment');
+app.use('/api/payment', paymentRoute);
 
 
 

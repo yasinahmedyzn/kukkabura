@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useCart } from "../src/context/CartContext";
 import { Link } from "react-router-dom";
 import { Minus, Plus, Trash2 } from "lucide-react";
+import axios from "axios";
 
 const CartPage = () => {
   const { items, loading, fetchCart, updateQty, remove, clearCart } = useCart();
@@ -15,10 +16,46 @@ const CartPage = () => {
     0
   );
 
-  if (loading)
-    return <p className="text-center mt-10 text-gray-500">Loading cart...</p>;
+  const handleProceedToPay = async () => {
+    try {
+      const customer = {
+        name: "Test User",
+        email: "test@example.com",
+        phone: "01700000000",
+        address: "123 Main Street",
+        city: "Dhaka",
+        postcode: "1207",
+        country: "Bangladesh",
+      };
 
-  if (items.length === 0)
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/payment/init`, {
+        amount: subtotal.toFixed(2),
+        tran_id: `txn_${Date.now()}`,
+        customerName: customer.name,
+        customerEmail: customer.email,
+        customerPhone: customer.phone,
+        customerAddress: customer.address,
+        customerCity: customer.city,
+        customerPostcode: customer.postcode,
+        customerCountry: customer.country,
+      });
+
+      if (response.data.GatewayPageURL) {
+        window.location.href = response.data.GatewayPageURL;
+      } else {
+        alert("Failed to initiate payment. Please try again.");
+      }
+    } catch (error) {
+      console.error("Payment initiation error:", error);
+      alert("Something went wrong while initiating the payment.");
+    }
+  };
+
+  if (loading) {
+    return <p className="text-center mt-10 text-gray-500">Loading cart...</p>;
+  }
+
+  if (items.length === 0) {
     return (
       <div className="text-center mt-10">
         <h2 className="text-xl font-bold mb-4">Your cart is empty 🛒</h2>
@@ -30,16 +67,16 @@ const CartPage = () => {
         </Link>
       </div>
     );
+  }
 
   return (
     <div className="max-w-5xl mx-auto p-4">
       <h1 className="text-2xl md:text-3xl font-bold mb-6">🛍 Your Cart</h1>
 
-      {/* Cart Items */}
       <div className="space-y-4">
         {items.map((item) => {
           const product = item.productId;
-          if (!product) return null; // skip if product was deleted
+          if (!product) return null;
 
           return (
             <div
@@ -104,7 +141,10 @@ const CartPage = () => {
         </div>
 
         <div className="mt-4 flex flex-col space-y-2">
-          <button className="bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition">
+          <button
+            onClick={handleProceedToPay}
+            className="bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition"
+          >
             Proceed to Checkout
           </button>
           <button
