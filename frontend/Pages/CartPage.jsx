@@ -154,12 +154,7 @@ const CartPage = () => {
           </button>
           <button
             onClick={clearCart}
-            className="bg-green-500 text-white py-2 rounded-lg 
-             hover:bg-green-600 
-             active:bg-green-700 
-             active:scale-95 
-             transition duration-150 ease-in-out 
-             transform focus:outline-none w-full"
+            className="bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition"
           >
             Clear Cart
           </button>
