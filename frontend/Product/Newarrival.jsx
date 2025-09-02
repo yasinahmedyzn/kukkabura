@@ -132,7 +132,15 @@ export default function NewArrival() {
   );
 }
 
-function ProductCard({ product, isHovered, isFavorite, onHover, onLeave, onToggleFavorite, onAddToCart }) {
+function ProductCard({
+  product,
+  isHovered,
+  isFavorite,
+  onHover,
+  onLeave,
+  onToggleFavorite,
+  onAddToCart,
+}) {
   const [hoverCart, setHoverCart] = useState(false);
 
   return (
@@ -141,43 +149,74 @@ function ProductCard({ product, isHovered, isFavorite, onHover, onLeave, onToggl
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
     >
+      {/* ❤️ Favorite Button */}
       <button
-        onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault(); // Prevent navigation
+          onToggleFavorite();
+        }}
         className="absolute top-2 right-2 z-10 p-1 rounded-full hover:bg-gray-100 transition-colors"
       >
-        <Heart className={`w-4 h-4 ${isFavorite ? "fill-red-500 text-red-500" : "text-gray-400 hover:text-red-500"}`} />
+        <Heart
+          className={`w-4 h-4 ${
+            isFavorite ? "fill-red-500 text-red-500" : "text-gray-400 hover:text-red-500"
+          }`}
+        />
       </button>
 
-      <div className="relative mb-3">
+      {/* 🖼️ Product Image (wrapped in Link) */}
+      <Link to={`/product/${product._id}`} className="block relative mb-3">
         <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden relative">
           <img
             src={product.imageUrl}
             alt={product.name}
-            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${isHovered ? "opacity-0" : "opacity-100"}`}
+            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${
+              isHovered ? "opacity-0" : "opacity-100"
+            }`}
           />
           {product.hoverImageUrl && (
             <img
               src={product.hoverImageUrl}
               alt={`${product.name} - alternate view`}
-              className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-0"}`}
+              className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${
+                isHovered ? "opacity-100" : "opacity-0"
+              }`}
             />
           )}
         </div>
-      </div>
+      </Link>
 
+      {/* 📝 Product Details */}
       <div className="space-y-1">
         <p className="text-xs font-medium text-gray-900">{product.brand}</p>
-        <h3 className="text-xs md:text-sm text-gray-700 line-clamp-2 leading-tight">{product.name}</h3>
+
+        {/* Name wrapped in Link */}
+        <Link to={`/product/${product._id}`}>
+          <h3 className="text-xs md:text-sm text-gray-700 line-clamp-2 leading-tight hover:underline">
+            {product.name}
+          </h3>
+        </Link>
 
         <div className="flex items-center justify-between pt-2">
           <span className="text-sm font-semibold text-red-600">৳ {product.price}</span>
+
+          {/* 🛒 Add to Cart Button */}
           <button
             onMouseEnter={() => setHoverCart(true)}
             onMouseLeave={() => setHoverCart(false)}
             onTouchStart={() => setHoverCart(true)}
             onTouchEnd={() => setHoverCart(false)}
-            onClick={(e) => { e.stopPropagation(); onAddToCart(); }}
-            className={`p-1.5 rounded-md transition-colors ${hoverCart ? "bg-red-500 text-white" : "bg-gray-900 text-white hover:bg-gray-800"}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault(); // Prevent navigation
+              onAddToCart();
+            }}
+            className={`p-1.5 rounded-md transition-colors ${
+              hoverCart
+                ? "bg-red-500 text-white"
+                : "bg-gray-900 text-white hover:bg-gray-800"
+            }`}
           >
             <ShoppingCart className="w-3 h-3" />
           </button>
@@ -186,3 +225,4 @@ function ProductCard({ product, isHovered, isFavorite, onHover, onLeave, onToggl
     </div>
   );
 }
+

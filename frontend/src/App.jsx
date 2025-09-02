@@ -19,6 +19,7 @@ import FaceProducts from "../Pages/Face.jsx";
 import LipProducts from "../Pages/Lip.jsx";
 import Profile from "../Auth/Profile.jsx";
 import Footer from "../Footer/Footer.jsx";
+import ProductDetails from "../Pages/ProductDetails.jsx";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
               <Route path="/admin-dashboard" element={<Admin_dashboard />} />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/product" element={<CategoryPage />} />
+              <Route path="/product/:id" element={<ProductDetails />} />
               <Route path="/product/eyes-products" element={<EyeProducts />} />
               <Route path="/product/face-products" element={<FaceProducts />} />
               <Route path="/product/lip-products" element={<LipProducts />} />

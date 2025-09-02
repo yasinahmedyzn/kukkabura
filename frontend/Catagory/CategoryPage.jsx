@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import { Heart, ShoppingCart, ChevronDown, ChevronUp, Filter } from "lucide-react";
 import { useAddToCart } from "../src/hooks/useAddToCart";
 import LoginModal from "../Auth/loginmodal";
@@ -87,9 +88,8 @@ const CategoryProducts = () => {
 
       {/* Sidebar Filters */}
       <aside
-        className={`w-full md:w-60 bg-gray-50 rounded-lg p-3 md:p-4 space-y-4 shadow-sm border border-gray-200 ${
-          mobileFilterOpen ? "block" : "hidden md:block"
-        }`}
+        className={`w-full md:w-60 bg-gray-50 rounded-lg p-3 md:p-4 space-y-4 shadow-sm border border-gray-200 ${mobileFilterOpen ? "block" : "hidden md:block"
+          }`}
       >
         {/* Categories */}
         <div>
@@ -223,30 +223,34 @@ const CategoryProducts = () => {
                     <Heart size={12} />
                   </button>
 
-                  {/* Image */}
-                  <img
-                    src={defaultImage}
-                    alt={p.name}
-                    className="w-full h-28 sm:h-32 object-contain mb-1 sm:mb-2 transition-all duration-300"
-                    onMouseEnter={(e) => (e.currentTarget.src = hoverImage)}
-                    onMouseLeave={(e) => (e.currentTarget.src = defaultImage)}
-                  />
+                  {/* 🖼️ Clickable Link - image, brand, name, price */}
+                  <Link to={`/product/${p._id}`}>
 
-                  {/* Brand & Name */}
-                  <p className="text-[10px] sm:text-xs font-semibold text-gray-800 truncate">{p.brand}</p>
-                  <p className="text-[10px] sm:text-xs text-gray-600 truncate">{p.name}</p>
+                    {/* Image */}
+                    <img
+                      src={defaultImage}
+                      alt={p.name}
+                      className="w-full h-28 sm:h-32 object-contain mb-1 sm:mb-2 transition-all duration-300"
+                      onMouseEnter={(e) => (e.currentTarget.src = hoverImage)}
+                      onMouseLeave={(e) => (e.currentTarget.src = defaultImage)}
+                    />
 
-                  {/* Price */}
-                  <div className="flex items-center gap-1 sm:gap-2 mt-1">
-                    {p.discprice ? (
-                      <>
-                        <span className="text-gray-400 line-through text-[10px] sm:text-xs">৳ {p.price}</span>
-                        <span className="text-red-600 font-semibold text-xs sm:text-sm">৳ {p.discprice}</span>
-                      </>
-                    ) : (
-                      <span className="text-red-600 font-semibold text-xs sm:text-sm">৳ {p.price}</span>
-                    )}
-                  </div>
+                    {/* Brand & Name */}
+                    <p className="text-[10px] sm:text-xs font-semibold text-gray-800 truncate">{p.brand}</p>
+                    <p className="text-[10px] sm:text-xs text-gray-600 truncate">{p.name}</p>
+
+                    {/* Price */}
+                    <div className="flex items-center gap-1 sm:gap-2 mt-1">
+                      {p.discprice ? (
+                        <>
+                          <span className="text-gray-400 line-through text-[10px] sm:text-xs">৳ {p.price}</span>
+                          <span className="text-red-600 font-semibold text-xs sm:text-sm">৳ {p.discprice}</span>
+                        </>
+                      ) : (
+                        <span className="text-red-600 font-semibold text-xs sm:text-sm">৳ {p.price}</span>
+                      )}
+                    </div>
+                  </Link>
 
                   {/* Cart */}
                   <button

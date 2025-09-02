@@ -38,14 +38,14 @@ router.get("/all/brands", async (req, res) => {
 // ✅ Get products by filters (category, brand, price, sort, pagination)
 router.get("/all/products", async (req, res) => {
   try {
-    const { 
-      category, 
-      brand, 
-      sort = "latest", 
-      minPrice = 0, 
-      maxPrice = Infinity, 
-      page = 1, 
-      limit = 12 
+    const {
+      category,
+      brand,
+      sort = "latest",
+      minPrice = 0,
+      maxPrice = Infinity,
+      page = 1,
+      limit = 12
     } = req.query;
 
     // Build filter
@@ -87,6 +87,41 @@ router.get("/all/products", async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Error fetching products", error });
+  }
+});
+
+// ✅ Get single product by ID from any schema
+router.get("/details/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    let product =
+      (await TopProduct.findById(id)) ||
+      (await DiscountProduct.findById(id)) ||
+      (await NewProduct.findById(id)) ||
+      (await AddProduct.findById(id));
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // ✅ Normalize response (so frontend doesn’t need to check schema type)
+    const normalized = {
+      _id: product._id,
+      name: product.name,
+      brand: product.brand,
+      category: product.category,
+      price: product.price,
+      discountPrice: product.discprice || product.price, // handle discount
+      imageUrl: product.imageUrl,
+      hoverImageUrl: product.hoverImageUrl,
+      type: product.type || "General",
+      createdAt: product.createdAt,
+    };
+
+    res.json(normalized);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching product details", error });
   }
 });
 

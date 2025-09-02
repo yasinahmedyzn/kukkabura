@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import { Heart, ShoppingCart } from "lucide-react";
 import { useAddToCart } from "../src/hooks/useAddToCart";
 import LoginModal from "../Auth/loginmodal";
@@ -8,12 +9,12 @@ const BathBodyProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const { 
-    handleAddToCart, 
-    toast, 
-    showLogin, 
-    setShowLogin, 
-    handleLoginSuccess 
+  const {
+    handleAddToCart,
+    toast,
+    showLogin,
+    setShowLogin,
+    handleLoginSuccess
   } = useAddToCart();
 
   useEffect(() => {
@@ -47,9 +48,9 @@ const BathBodyProducts = () => {
 
       {/* Login Modal */}
       {showLogin && (
-        <LoginModal 
-          onClose={() => setShowLogin(false)} 
-          onLoginSuccess={handleLoginSuccess} 
+        <LoginModal
+          onClose={() => setShowLogin(false)}
+          onLoginSuccess={handleLoginSuccess}
         />
       )}
 
@@ -73,50 +74,53 @@ const BathBodyProducts = () => {
             const hoverImage = p.hoverImageUrl || p.imageUrl;
 
             return (
-              <div
-                key={p._id}
-                className="relative bg-white rounded-md p-2 sm:p-3 hover:shadow transition"
-              >
-                {/* Heart Icon */}
-                <button className="absolute top-1 right-1 sm:top-2 sm:right-2 text-gray-400 hover:text-red-500">
+              <div key={p._id} className="relative bg-white rounded-md p-2 sm:p-3 hover:shadow transition">
+
+                {/* Heart Icon (optional) */}
+                <button
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute top-1 right-1 sm:top-2 sm:right-2 text-gray-400 hover:text-red-500"
+                >
                   <Heart size={12} />
                 </button>
 
-                {/* Image */}
-                <img
-                  src={defaultImage}
-                  alt={p.name}
-                  className="w-full h-28 sm:h-32 object-contain mb-1 sm:mb-2 transition-all duration-300"
-                  onMouseEnter={(e) => (e.currentTarget.src = hoverImage)}
-                  onMouseLeave={(e) => (e.currentTarget.src = defaultImage)}
-                />
+                {/* 🖼️ Wrap only clickable content inside Link */}
+                <Link to={`/product/${p._id}`}>
+                  <img
+                    src={defaultImage}
+                    alt={p.name}
+                    className="w-full h-28 sm:h-32 object-contain mb-1 sm:mb-2 transition-all duration-300"
+                    onMouseEnter={(e) => (e.currentTarget.src = hoverImage)}
+                    onMouseLeave={(e) => (e.currentTarget.src = defaultImage)}
+                  />
+                  <p className="text-[10px] sm:text-xs font-semibold text-gray-800 truncate">{p.brand}</p>
+                  <p className="text-[10px] sm:text-xs text-gray-600 truncate">{p.name}</p>
+                  <div className="flex items-center gap-1 sm:gap-2 mt-1">
+                    {p.discprice ? (
+                      <>
+                        <span className="text-gray-400 line-through text-[10px] sm:text-xs">৳ {p.price}</span>
+                        <span className="text-red-600 font-semibold text-xs sm:text-sm">৳ {p.discprice}</span>
+                      </>
+                    ) : (
+                      <span className="text-red-600 font-semibold text-xs sm:text-sm">৳ {p.price}</span>
+                    )}
+                  </div>
+                </Link>
 
-                {/* Brand */}
-                <p className="text-[10px] sm:text-xs font-semibold text-gray-800 truncate">{p.brand}</p>
-
-                {/* Name */}
-                <p className="text-[10px] sm:text-xs text-gray-600 truncate">{p.name}</p>
-
-                {/* Price */}
-                <div className="flex items-center gap-1 sm:gap-2 mt-1">
-                  {p.discprice ? (
-                    <>
-                      <span className="text-gray-400 line-through text-[10px] sm:text-xs">৳ {p.price}</span>
-                      <span className="text-red-600 font-semibold text-xs sm:text-sm">৳ {p.discprice}</span>
-                    </>
-                  ) : (
-                    <span className="text-red-600 font-semibold text-xs sm:text-sm">৳ {p.price}</span>
-                  )}
-                </div>
-
-                {/* Cart Icon */}
+                {/* 🛒 Add to Cart Button - stays OUTSIDE the Link */}
                 <button
-                  onClick={() => handleAddToCart(p._id)}
+                  onClick={(e) => {
+                    e.preventDefault();   // ⛔ Prevent button default behavior
+                    e.stopPropagation();  // 🛑 Prevent link click
+                    handleAddToCart(p._id);
+                  }}
                   className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 bg-black text-white p-1 rounded"
                 >
                   <ShoppingCart size={12} />
                 </button>
+
               </div>
+
             );
           })
         ) : (
