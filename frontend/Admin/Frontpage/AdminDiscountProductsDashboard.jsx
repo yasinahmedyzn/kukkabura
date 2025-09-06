@@ -8,19 +8,32 @@ export default function AdminDiscountProduct() {
     price: "",
     discprice: "",
     category: "",
-    image: null,
+    images: [],
     hoverImage: null,
+    thumbnailIndex: 0,
   });
   const [products, setProducts] = useState([]);
   const [message, setMessage] = useState("");
   const [uploading, setUploading] = useState(false);
   const [editingProductId, setEditingProductId] = useState(null);
-  const [editForm, setEditForm] = useState({ name: "", price: "", discprice: "", category: "", image: null, hoverImage: null });
+  const [editForm, setEditForm] = useState({
+    name: "",
+    price: "",
+    discprice: "",
+    category: "",
+    images: [],
+    hoverImage: null,
+    thumbnailIndex: 0,
+  });
+  const [showImagesModal, setShowImagesModal] = useState(false);
+  const [modalImages, setModalImages] = useState([]);
+  const [modalThumbnailIndex, setModalThumbnailIndex] = useState(0);
+  const [modalProductId, setModalProductId] = useState(null);
 
-  const fileInputMain = useRef(null);
+  const fileInputImages = useRef(null);
   const fileInputHover = useRef(null);
 
-  const fileEditMain = useRef(null);
+  const fileEditImages = useRef(null);
   const fileEditHover = useRef(null);
 
   // Fetch existing products
@@ -40,24 +53,57 @@ export default function AdminDiscountProduct() {
   // Handle form changes
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (files) {
-      setForm((prev) => ({ ...prev, [name]: files[0] }));
+    if (name === "images" && files) {
+      setForm((prev) => ({
+        ...prev,
+        images: Array.from(files),
+        thumbnailIndex: 0,
+      }));
+    } else if (name === "hoverImage" && files) {
+      setForm((prev) => ({ ...prev, hoverImage: files[0] }));
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
   };
 
+  // Handle thumbnail selection
+  const handleThumbnailSelect = (idx) => {
+    setForm((prev) => ({ ...prev, thumbnailIndex: idx }));
+  };
+
   // Handle edit form changes
   const handleEditChange = (e) => {
-    const { name, value } = e.target;
-    setEditForm((prev) => ({ ...prev, [name]: value }));
+    const { name, value, files } = e.target;
+    if (name === "images" && files) {
+      setEditForm((prev) => ({
+        ...prev,
+        images: Array.from(files),
+        thumbnailIndex: 0,
+      }));
+    } else if (name === "hoverImage" && files) {
+      setEditForm((prev) => ({ ...prev, hoverImage: files[0] }));
+    } else {
+      setEditForm((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleEditThumbnailSelect = (idx) => {
+    setEditForm((prev) => ({ ...prev, thumbnailIndex: idx }));
   };
 
   // Upload new product
   const handleUpload = async (e) => {
     e.preventDefault();
-    if (!form.brand || !form.name || !form.category || !form.price || !form.discprice || !form.image || !form.hoverImage) {
-      setMessage("Please fill in all fields and select both images.");
+    if (
+      !form.brand ||
+      !form.name ||
+      !form.category ||
+      !form.price ||
+      !form.discprice ||
+      form.images.length === 0 ||
+      !form.hoverImage
+    ) {
+      setMessage("Please fill in all fields and select images.");
       return;
     }
 
@@ -66,12 +112,12 @@ export default function AdminDiscountProduct() {
     formData.append("name", form.name);
     form.category
       .split(",")
-      .map(c => c.trim())
-      .filter(Boolean)
-      .forEach(c => formData.append("category[]", c));
+      .map((c) => c.trim())
+      .forEach((c) => formData.append("category[]", c));
     formData.append("price", form.price);
     formData.append("discprice", form.discprice);
-    formData.append("image", form.image);
+    form.images.forEach((img) => formData.append("images", img));
+    formData.append("thumbnailIndex", form.thumbnailIndex);
     formData.append("hoverImage", form.hoverImage);
 
     try {
@@ -80,8 +126,17 @@ export default function AdminDiscountProduct() {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setMessage("✅ Product added!");
-      setForm({ brand: "", name: "", category: "", price: "", discprice: "", image: null, hoverImage: null });
-      fileInputMain.current.value = null;
+      setForm({
+        brand: "",
+        name: "",
+        price: "",
+        discprice: "",
+        category: "",
+        images: [],
+        hoverImage: null,
+        thumbnailIndex: 0,
+      });
+      fileInputImages.current.value = null;
       fileInputHover.current.value = null;
       fetchProducts();
     } catch (err) {
@@ -99,7 +154,7 @@ export default function AdminDiscountProduct() {
     try {
       await axios.delete(`${import.meta.env.VITE_API_URL}/api/discount-products/${product._id}`, {
         data: {
-          imagePublicId: product.imagePublicId,
+          imagesPublicIds: product.images?.map((img) => img.publicId),
           hoverImagePublicId: product.hoverImagePublicId,
         },
       });
@@ -116,7 +171,11 @@ export default function AdminDiscountProduct() {
     setEditForm({
       name: product.name,
       price: product.price,
-      category: Array.isArray(product.category) ? product.category.join(", ") : (product.category || "")
+      discprice: product.discprice,
+      category: Array.isArray(product.category) ? product.category.join(", ") : product.category || "",
+      images: [],
+      hoverImage: null,
+      thumbnailIndex: product.thumbnailIndex || 0,
     });
   };
 
@@ -126,14 +185,16 @@ export default function AdminDiscountProduct() {
       const data = new FormData();
       data.append("name", editForm.name);
       data.append("price", editForm.price);
+      data.append("discprice", editForm.discprice);
       if (editForm.category) {
         editForm.category
           .split(",")
-          .map(c => c.trim())
+          .map((c) => c.trim())
           .filter(Boolean)
-          .forEach(c => data.append("category[]", c));
+          .forEach((c) => data.append("category[]", c));
       }
-      if (editForm.image) data.append("image", editForm.image);
+      editForm.images.forEach((img) => data.append("images", img));
+      data.append("thumbnailIndex", editForm.thumbnailIndex);
       if (editForm.hoverImage) data.append("hoverImage", editForm.hoverImage);
 
       const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/discount-products/${productId}`, data, {
@@ -154,6 +215,46 @@ export default function AdminDiscountProduct() {
   // Cancel editing
   const handleCancelEdit = () => {
     setEditingProductId(null);
+  };
+
+  // Show modal with all images for a product
+  const handleShowImagesModal = (product) => {
+    setModalImages(product.images || []);
+    setModalThumbnailIndex(product.thumbnailIndex || 0);
+    setModalProductId(product._id);
+    setShowImagesModal(true);
+  };
+
+  // Set thumbnail from modal
+  const handleSetThumbnailFromModal = async (idx) => {
+    try {
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/api/discount-products/${modalProductId}`,
+        { thumbnailIndex: idx },
+        { headers: { "Content-Type": "application/json" } }
+      );
+      setModalThumbnailIndex(idx);
+      setShowImagesModal(false);
+      fetchProducts();
+    } catch (err) {
+      alert("Failed to set thumbnail.");
+    }
+  };
+
+  // Delete image from modal
+  const handleDeleteImageFromModal = async (imgIdx) => {
+    const imageToDelete = modalImages[imgIdx];
+    if (!imageToDelete) return;
+    if (!confirm("Delete this image?")) return;
+    try {
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/discount-products/${modalProductId}`, {
+        deleteImagePublicId: imageToDelete.publicId,
+      });
+      setShowImagesModal(false);
+      fetchProducts();
+    } catch (err) {
+      alert("Failed to delete image.");
+    }
   };
 
   return (
@@ -182,7 +283,7 @@ export default function AdminDiscountProduct() {
               onChange={handleChange}
               className="w-full border rounded px-2 py-1 focus:outline-none focus:ring focus:ring-blue-200"
             />
-           <input
+            <input
               type="text"
               name="category"
               placeholder="Categories (comma separated)"
@@ -201,31 +302,48 @@ export default function AdminDiscountProduct() {
             <input
               type="number"
               name="discprice"
-              placeholder="discount Price"
+              placeholder="Discount Price"
               value={form.discprice}
               onChange={handleChange}
               className="w-full border rounded px-2 py-1 focus:outline-none focus:ring focus:ring-blue-200"
             />
 
-            {/* Main Image */}
+            {/* Images Upload */}
             <div className="flex items-center gap-2">
-              <label className="text-xs font-medium">Main Image:</label>
+              <label className="text-xs font-medium">Product Images:</label>
               <button
                 type="button"
-                onClick={() => fileInputMain.current.click()}
+                onClick={() => fileInputImages.current.click()}
                 className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
               >
                 Choose
               </button>
               <input
                 type="file"
-                ref={fileInputMain}
-                name="image"
+                ref={fileInputImages}
+                name="images"
                 accept="image/*"
+                multiple
                 onChange={handleChange}
                 className="hidden"
               />
-              {form.image && <span className="text-xs text-gray-500 truncate">{form.image.name}</span>}
+              {/* Preview and thumbnail selector */}
+              <div className="flex gap-2 mt-2">
+                {form.images.map((img, idx) => (
+                  <div key={idx} className="relative">
+                    <img
+                      src={URL.createObjectURL(img)}
+                      alt={`preview-${idx}`}
+                      className={`w-16 h-16 object-cover border ${form.thumbnailIndex === idx ? "border-blue-500" : "border-gray-300"}`}
+                      onClick={() => handleThumbnailSelect(idx)}
+                      style={{ cursor: "pointer" }}
+                    />
+                    {form.thumbnailIndex === idx && (
+                      <span className="absolute top-0 left-0 bg-blue-500 text-white text-xs px-1 rounded-br">Thumbnail</span>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Hover Image */}
@@ -311,24 +429,41 @@ export default function AdminDiscountProduct() {
                       onChange={handleEditChange}
                       className="w-full border rounded px-1 py-1 mb-1 text-xs focus:outline-none focus:ring focus:ring-blue-200"
                     />
-                    {/* Main Image */}
+
+                    {/* Images Upload */}
                     <div className="flex items-center gap-2 mb-1">
                       <button
                         type="button"
-                        onClick={() => fileEditMain.current.click()}
+                        onClick={() => fileEditImages.current.click()}
                         className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
                       >
-                        Choose Main Image
+                        Choose Images
                       </button>
                       <input
                         type="file"
-                        ref={fileEditMain}
-                        name="image"
+                        ref={fileEditImages}
+                        name="images"
                         accept="image/*"
-                        onChange={(e) => setEditForm((prev) => ({ ...prev, image: e.target.files[0] }))}
+                        multiple
+                        onChange={handleEditChange}
                         className="hidden"
                       />
-                      {editForm.image && <span className="text-xs text-gray-500 truncate">{editForm.image.name}</span>}
+                      <div className="flex gap-2 mt-2">
+                        {editForm.images.map((img, idx) => (
+                          <div key={idx} className="relative">
+                            <img
+                              src={URL.createObjectURL(img)}
+                              alt={`edit-preview-${idx}`}
+                              className={`w-12 h-12 object-cover border ${editForm.thumbnailIndex === idx ? "border-blue-500" : "border-gray-300"}`}
+                              onClick={() => handleEditThumbnailSelect(idx)}
+                              style={{ cursor: "pointer" }}
+                            />
+                            {editForm.thumbnailIndex === idx && (
+                              <span className="absolute top-0 left-0 bg-blue-500 text-white text-xs px-1 rounded-br">Thumbnail</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     </div>
 
                     {/* Hover Image */}
@@ -345,7 +480,7 @@ export default function AdminDiscountProduct() {
                         ref={fileEditHover}
                         name="hoverImage"
                         accept="image/*"
-                        onChange={(e) => setEditForm((prev) => ({ ...prev, hoverImage: e.target.files[0] }))}
+                        onChange={handleEditChange}
                         className="hidden"
                       />
                       {editForm.hoverImage && <span className="text-xs text-gray-500 truncate">{editForm.hoverImage.name}</span>}
@@ -369,13 +504,20 @@ export default function AdminDiscountProduct() {
                 ) : (
                   // Display Mode
                   <>
-
                     <div className="relative group">
-                      <img
-                        src={p.imageUrl}
-                        alt={p.name}
-                        className="w-full h-24 object-contain transition-opacity duration-300 group-hover:opacity-0"
-                      />
+                      {Array.isArray(p.images) && p.images.length > 0 ? (
+                        <img
+                          src={p.images[p.thumbnailIndex || 0]?.url}
+                          alt={p.name}
+                          className="w-full h-24 object-contain transition-opacity duration-300 group-hover:opacity-0"
+                        />
+                      ) : (
+                        <img
+                          src={p.imageUrl}
+                          alt={p.name}
+                          className="w-full h-24 object-contain transition-opacity duration-300 group-hover:opacity-0"
+                        />
+                      )}
                       <img
                         src={p.hoverImageUrl}
                         alt={p.name + " hover"}
@@ -385,12 +527,58 @@ export default function AdminDiscountProduct() {
                     <h4 className="font-medium mt-1">{p.name}</h4>
                     <p className="text-gray-500">{p.brand}</p>
                     <p className="text-blue-600 font-bold">${p.price}</p>
+                    {/* Images uploaded button */}
+                    <button
+                      type="button"
+                      className="text-xs text-blue-700 underline mt-1"
+                      onClick={() => handleShowImagesModal(p)}
+                    >
+                      Images uploaded: {Array.isArray(p.images) ? p.images.length : 0}
+                    </button>
                   </>
                 )}
               </div>
             ))}
           </div>
         </div>
+        {/* Images Modal */}
+        {showImagesModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-4 w-80">
+              <h4 className="font-semibold mb-2 text-sm">Product Images</h4>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {modalImages.map((img, idx) => (
+                  <div key={idx} className="relative">
+                    <img
+                      src={img.url}
+                      alt={`modal-img-${idx}`}
+                      className={`w-16 h-16 object-cover border ${modalThumbnailIndex === idx ? "border-blue-500" : "border-gray-300"}`}
+                      style={{ cursor: "pointer" }}
+                      onClick={() => handleSetThumbnailFromModal(idx)}
+                    />
+                    {modalThumbnailIndex === idx && (
+                      <span className="absolute top-0 left-0 bg-blue-500 text-white text-xs px-1 rounded-br">Thumbnail</span>
+                    )}
+                    <button
+                      type="button"
+                      className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1"
+                      onClick={() => handleDeleteImageFromModal(idx)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <button
+                type="button"
+                className="w-full py-1 bg-gray-600 text-white text-xs rounded"
+                onClick={() => setShowImagesModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

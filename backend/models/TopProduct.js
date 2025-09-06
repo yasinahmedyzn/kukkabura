@@ -6,10 +6,15 @@ const topProductSchema = new mongoose.Schema(
     name: { type: String, required: true },
     category: { type: [String], required: true },
     price: { type: Number, required: true },
-    imageUrl: { type: String, required: true },
-    imagePublicId: { type: String, required: true },
+    images: [
+      {
+        url: { type: String, required: true },
+        publicId: { type: String, required: true }
+      }
+    ],
     hoverImageUrl: { type: String, required: true },
     hoverImagePublicId: { type: String, required: true },
+    thumbnailIndex: { type: Number, default: 0 }, 
   },
   { timestamps: true }
 );

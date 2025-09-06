@@ -31,22 +31,26 @@ function normalizeCategory(body) {
 router.post(
   "/",
   upload.fields([
-    { name: "image", maxCount: 1 },
+    { name: "images", maxCount: 10 },
     { name: "hoverImage", maxCount: 1 },
   ]),
   async (req, res) => {
     try {
-      const { brand, name, price } = req.body;
+      const { brand, name, price, thumbnailIndex } = req.body;
       const category = normalizeCategory(req.body);
       if (!category.length) return res.status(400).json({ message: "Category is required" });
 
-      if (!req.files.image || !req.files.hoverImage) {
-        return res.status(400).json({ message: "Both images are required" });
+      if (!req.files.images || !req.files.hoverImage) {
+        return res.status(400).json({ message: "Product images and hover image are required" });
       }
 
-      const imageUrl = req.files.image[0].path;
+      // Map all images to array
+      const images = req.files.images.map(file => ({
+        url: file.path,
+        publicId: file.filename,
+      }));
+
       const hoverImageUrl = req.files.hoverImage[0].path;
-      const imagePublicId = req.files.image[0].filename;
       const hoverImagePublicId = req.files.hoverImage[0].filename;
 
       const product = new AddProduct({
@@ -54,9 +58,9 @@ router.post(
         name,
         price,
         category,
-        imageUrl,
+        images,
+        thumbnailIndex: Number(thumbnailIndex) || 0,
         hoverImageUrl,
-        imagePublicId,
         hoverImagePublicId,
       });
 
@@ -90,15 +94,16 @@ router.delete("/:id", async (req, res) => {
     const product = await AddProduct.findById(req.params.id);
     if (!product) return res.status(404).json({ message: "Product not found" });
 
-    // Delete images from Cloudinary
-    if (product.imagePublicId) {
-      await cloudinary.uploader.destroy(product.imagePublicId);
+    // Delete all product images from Cloudinary
+    if (product.images && product.images.length) {
+      for (const img of product.images) {
+        await cloudinary.uploader.destroy(img.publicId);
+      }
     }
     if (product.hoverImagePublicId) {
       await cloudinary.uploader.destroy(product.hoverImagePublicId);
     }
 
-    // Delete product from MongoDB
     await AddProduct.findByIdAndDelete(req.params.id);
 
     res.json({ message: "Deleted product and images successfully" });
@@ -107,57 +112,99 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ message: "Server error: " + err.message });
   }
 });
+
 // -----------------------------------
-// UPDATE PRODUCT (name, price, optional images)
+// UPDATE PRODUCT (name, price, optional images, thumbnail, delete image)
 // -----------------------------------
 router.put(
   "/:id",
   upload.fields([
-    { name: "image", maxCount: 1 },
+    { name: "images", maxCount: 10 },
     { name: "hoverImage", maxCount: 1 },
   ]),
   async (req, res) => {
     try {
-      const { name, price, brand, category } = req.body; // include brand also
-      const product = await AddProduct.findById(req.params.id);
+      // If the request is JSON (no files), use req.body directly
+      if (req.is('application/json')) {
+        const { thumbnailIndex, deleteImagePublicId } = req.body;
+        const product = await AddProduct.findById(req.params.id);
+        if (!product) return res.status(404).json({ message: "Product not found" });
 
-      const nextCategory = normalizeCategory(req.body);
-      if (nextCategory.length) product.category = nextCategory;
+        // Handle thumbnail change
+        if (thumbnailIndex !== undefined) {
+          product.thumbnailIndex = Number(thumbnailIndex);
+        }
+
+        // Handle image deletion
+        if (deleteImagePublicId) {
+          const idx = product.images.findIndex(img => img.publicId === deleteImagePublicId);
+          if (idx !== -1) {
+            await cloudinary.uploader.destroy(deleteImagePublicId);
+            product.images.splice(idx, 1);
+            // If deleted image was thumbnail, reset thumbnailIndex
+            if (product.thumbnailIndex === idx) {
+              product.thumbnailIndex = 0;
+            } else if (product.thumbnailIndex > idx) {
+              product.thumbnailIndex -= 1;
+            }
+          }
+        }
+
+        await product.save();
+        return res.json(product);
+      }
+
+      // Otherwise, handle FormData (file uploads)
+      const { name, price, brand, category, thumbnailIndex, deleteImagePublicId } = req.body;
+      const product = await AddProduct.findById(req.params.id);
 
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
       }
 
-      // ✅ Update basic fields only if provided
+      const nextCategory = normalizeCategory(req.body);
+      if (nextCategory.length) product.category = nextCategory;
+
       if (brand !== undefined) product.brand = brand;
       if (name !== undefined) product.name = name;
       if (price !== undefined) product.price = price;
       if (category !== undefined) product.category = category;
 
-      // ✅ Update main image if new one uploaded
-      if (req.files && req.files.image) {
-        if (product.imagePublicId) {
-          await cloudinary.uploader.destroy(product.imagePublicId);
+      if (req.files && req.files.images) {
+        if (product.images && product.images.length) {
+          for (const img of product.images) {
+            await cloudinary.uploader.destroy(img.publicId);
+          }
         }
-        const uploadedImage = await cloudinary.uploader.upload(
-          req.files.image[0].path,
-          { folder: "add-products" }
-        );
-        product.imageUrl = uploadedImage.secure_url;
-        product.imagePublicId = uploadedImage.public_id;
+        product.images = req.files.images.map(file => ({
+          url: file.path,
+          publicId: file.filename,
+        }));
       }
 
-      // ✅ Update hover image if new one uploaded
+      if (thumbnailIndex !== undefined) {
+        product.thumbnailIndex = Number(thumbnailIndex);
+      }
+
+      if (deleteImagePublicId) {
+        const idx = product.images.findIndex(img => img.publicId === deleteImagePublicId);
+        if (idx !== -1) {
+          await cloudinary.uploader.destroy(deleteImagePublicId);
+          product.images.splice(idx, 1);
+          if (product.thumbnailIndex === idx) {
+            product.thumbnailIndex = 0;
+          } else if (product.thumbnailIndex > idx) {
+            product.thumbnailIndex -= 1;
+          }
+        }
+      }
+
       if (req.files && req.files.hoverImage) {
         if (product.hoverImagePublicId) {
           await cloudinary.uploader.destroy(product.hoverImagePublicId);
         }
-        const uploadedHover = await cloudinary.uploader.upload(
-          req.files.hoverImage[0].path,
-          { folder: "add-products" }
-        );
-        product.hoverImageUrl = uploadedHover.secure_url;
-        product.hoverImagePublicId = uploadedHover.public_id;
+        product.hoverImageUrl = req.files.hoverImage[0].path;
+        product.hoverImagePublicId = req.files.hoverImage[0].filename;
       }
 
       await product.save();

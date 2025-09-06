@@ -112,11 +112,16 @@ router.get("/details/:id", async (req, res) => {
       brand: product.brand,
       category: product.category,
       price: product.price,
-      discountPrice: product.discprice || product.price, // handle discount
-      imageUrl: product.imageUrl,
+      discountPrice: product.discprice || product.price,
+      images: product.images || [], 
+      thumbnailIndex: product.thumbnailIndex || 0, 
       hoverImageUrl: product.hoverImageUrl,
       type: product.type || "General",
       createdAt: product.createdAt,
+      description: product.description,
+      features: product.features,
+      benefits: product.benefits,
+    
     };
 
     res.json(normalized);

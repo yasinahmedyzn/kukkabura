@@ -160,9 +160,8 @@ function ProductCard({
         className="absolute top-2 right-2 z-10 p-1 rounded-full hover:bg-gray-100 transition-colors"
       >
         <Heart
-          className={`w-4 h-4 ${
-            isFavorite ? "fill-red-500 text-red-500" : "text-gray-400 hover:text-red-500"
-          }`}
+          className={`w-4 h-4 ${isFavorite ? "fill-red-500 text-red-500" : "text-gray-400 hover:text-red-500"
+            }`}
         />
       </button>
 
@@ -170,19 +169,17 @@ function ProductCard({
       <Link to={`/product/${product._id}`} className="block relative mb-3">
         <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden relative">
           <img
-            src={product.imageUrl}
+            src={product.images?.[product.thumbnailIndex || 0]?.url}
             alt={product.name}
-            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${
-              isHovered ? "opacity-0" : "opacity-100"
-            }`}
+            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${isHovered ? "opacity-0" : "opacity-100"
+              }`}
           />
           {product.hoverImageUrl && (
             <img
               src={product.hoverImageUrl}
               alt={`${product.name} - alternate view`}
-              className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${
-                isHovered ? "opacity-100" : "opacity-0"
-              }`}
+              className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-0"
+                }`}
             />
           )}
         </div>
@@ -213,11 +210,10 @@ function ProductCard({
               e.preventDefault(); // Prevent navigation
               onAddToCart();
             }}
-            className={`p-1.5 rounded-md transition-colors ${
-              hoverCart
+            className={`p-1.5 rounded-md transition-colors ${hoverCart
                 ? "bg-red-500 text-white"
                 : "bg-gray-900 text-white hover:bg-gray-800"
-            }`}
+              }`}
           >
             <ShoppingCart className="w-3 h-3" />
           </button>
