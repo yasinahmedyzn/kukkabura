@@ -22,7 +22,7 @@ const MakeupProducts = () => {
       setLoading(true);
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/products/all/products`,
+          `${import.meta.env.VITE_API_URL}/api/products`,
           { params: { category: "makeup" } }
         );
         setProducts(res.data.products || []);
@@ -37,7 +37,6 @@ const MakeupProducts = () => {
   }, []);
 
   return (
-
     <div className="container mx-auto px-4 py-4 max-w-6xl">
       {/* Toast */}
       {toast && (
@@ -63,14 +62,15 @@ const MakeupProducts = () => {
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         {products.length ? (
           products.map((p) => {
-            const defaultImage = p.imageUrl || "/placeholder.jpg";
-            const hoverImage = p.hoverImageUrl || p.imageUrl;
+            const defaultImage = p.images?.[0]?.url || "/placeholder.jpg";
+            const hoverImage = p.images?.[1]?.url || defaultImage;
+
+            // Determine if discount should be shown
+            const hasDiscount = p.discountPrice && p.discountPrice < p.price;
 
             return (
-
               <div key={p._id} className="relative bg-white rounded-md p-2 sm:p-3 hover:shadow transition">
-
-                {/* Heart Icon (optional) */}
+                {/* Heart Icon */}
                 <button
                   onClick={(e) => e.stopPropagation()}
                   className="absolute top-1 right-1 sm:top-2 sm:right-2 text-gray-400 hover:text-red-500"
@@ -78,7 +78,7 @@ const MakeupProducts = () => {
                   <Heart size={12} />
                 </button>
 
-                {/* 🖼️ Wrap only clickable content inside Link */}
+                {/* Clickable content */}
                 <Link to={`/product/${p._id}`}>
                   <img
                     src={defaultImage}
@@ -90,10 +90,10 @@ const MakeupProducts = () => {
                   <p className="text-[10px] sm:text-xs font-semibold text-gray-800 truncate">{p.brand}</p>
                   <p className="text-[10px] sm:text-xs text-gray-600 truncate">{p.name}</p>
                   <div className="flex items-center gap-1 sm:gap-2 mt-1">
-                    {p.discprice ? (
+                    {hasDiscount ? (
                       <>
                         <span className="text-gray-400 line-through text-[10px] sm:text-xs">৳ {p.price}</span>
-                        <span className="text-red-600 font-semibold text-xs sm:text-sm">৳ {p.discprice}</span>
+                        <span className="text-red-600 font-semibold text-xs sm:text-sm">৳ {p.discountPrice}</span>
                       </>
                     ) : (
                       <span className="text-red-600 font-semibold text-xs sm:text-sm">৳ {p.price}</span>
@@ -101,29 +101,25 @@ const MakeupProducts = () => {
                   </div>
                 </Link>
 
-                {/* 🛒 Add to Cart Button - stays OUTSIDE the Link */}
+                {/* Add to Cart */}
                 <button
                   onClick={(e) => {
-                    e.preventDefault();   // ⛔ Prevent button default behavior
-                    e.stopPropagation();  // 🛑 Prevent link click
+                    e.preventDefault();
+                    e.stopPropagation();
                     handleAddToCart(p._id);
                   }}
                   className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 bg-black text-white p-1 rounded"
                 >
                   <ShoppingCart size={12} />
                 </button>
-
               </div>
             );
           })
         ) : (
-          <p className="text-sm text-gray-500">
-            {loading ? "Loading..." : "No Makeup products available"}
-          </p>
+          <p className="text-sm text-gray-500">{loading ? "Loading..." : "No Makeup products available"}</p>
         )}
       </div>
     </div>
-
   );
 };
 

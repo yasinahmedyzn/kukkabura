@@ -52,10 +52,10 @@ export default function Footer() {
         <div className="border-t border-gray-700 mt-8 pt-6 flex flex-col items-center lg:flex-row lg:justify-between lg:items-center">
           {/* Social Icons */}
           <div className="flex justify-center gap-6 mb-4 lg:mb-0">
-            <a href="#" className="hover:text-white"><Facebook size={20} /></a>
-            <a href="#" className="hover:text-white"><Instagram size={20} /></a>
+            <a href="https://www.facebook.com/share/1B7CwDU83E/" className="hover:text-white"><Facebook size={20} /></a>
+            <a href="https://www.instagram.com/mei.glow?igsh=MW9wb216NGw5Ymc0bw==" className="hover:text-white"><Instagram size={20} /></a>
             <a href="#" className="hover:text-white"><Twitter size={20} /></a>
-            <a href="#" className="hover:text-white"><Youtube size={20} /></a>
+            <a href="https://www.youtube.com/@meiglowworld" className="hover:text-white"><Youtube size={20} /></a>
           </div>
 
           {/* Copyright */}

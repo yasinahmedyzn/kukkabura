@@ -1,22 +1,25 @@
-// routes/cart.js
 const express = require("express");
 const router = express.Router();
 const verifyToken = require("../middleware/authMiddleware");
 const Cart = require("../models/Cart");
-const TopProduct = require("../models/TopProduct");
-const NewProduct = require("../models/NewProduct");
-const DiscountProduct = require("../models/DiscountProducts");
-const AddProduct = require("../models/AddProduct"); // ✅ Include AddProduct
+const Product = require("../models/ProductSchema");
 
-// Helper: populate product from multiple collections
-const populateProduct = async (productId) => {
-  let product =
-    (await TopProduct.findById(productId)) ||
-    (await NewProduct.findById(productId)) ||
-    (await DiscountProduct.findById(productId)) ||
-    (await AddProduct.findById(productId));
-  return product;
-};
+// -------------------- Helper: normalize product --------------------
+function normalizeProduct(p) {
+  return {
+    _id: p._id,
+    brand: p.brand,
+    name: p.name,
+    category: p.category,
+    productType: p.productType,
+    price: p.price,
+    discountPercentage: p.discountPercentage || 0,
+    discountPrice: p.price - (p.price * (p.discountPercentage || 0)) / 100,
+    images: p.images || [],
+    thumbnailIndex: p.thumbnailIndex || 0,
+    hoverImageUrl: p.images?.[1]?.url || null, // 👈 auto hover image
+  };
+}
 
 // -------------------- GET CART --------------------
 router.get("/", verifyToken, async (req, res) => {
@@ -26,8 +29,8 @@ router.get("/", verifyToken, async (req, res) => {
 
     const itemsWithProduct = await Promise.all(
       cart.items.map(async (item) => {
-        const product = await populateProduct(item.productId);
-        return { ...item._doc, productId: product };
+        const product = await Product.findById(item.productId);
+        return { ...item._doc, product: product ? normalizeProduct(product) : null };
       })
     );
 
@@ -43,7 +46,7 @@ router.post("/", verifyToken, async (req, res) => {
   const { productId, quantity = 1 } = req.body;
 
   try {
-    const product = await populateProduct(productId);
+    const product = await Product.findById(productId);
     if (!product) return res.status(404).json({ message: "Product not found" });
 
     let cart = await Cart.findOne({ userId: req.user.id });
@@ -64,8 +67,8 @@ router.post("/", verifyToken, async (req, res) => {
     const updatedCart = await Cart.findOne({ userId: req.user.id });
     const itemsWithProduct = await Promise.all(
       updatedCart.items.map(async (item) => {
-        const product = await populateProduct(item.productId);
-        return { ...item._doc, productId: product };
+        const p = await Product.findById(item.productId);
+        return { ...item._doc, product: p ? normalizeProduct(p) : null };
       })
     );
 
@@ -101,8 +104,8 @@ router.put("/:productId", verifyToken, async (req, res) => {
     const updatedCart = await Cart.findOne({ userId: req.user.id });
     const itemsWithProduct = await Promise.all(
       updatedCart.items.map(async (item) => {
-        const product = await populateProduct(item.productId);
-        return { ...item._doc, productId: product };
+        const p = await Product.findById(item.productId);
+        return { ...item._doc, product: p ? normalizeProduct(p) : null };
       })
     );
 
@@ -128,8 +131,8 @@ router.delete("/:productId", verifyToken, async (req, res) => {
     const updatedCart = await Cart.findOne({ userId: req.user.id });
     const itemsWithProduct = await Promise.all(
       updatedCart.items.map(async (item) => {
-        const product = await populateProduct(item.productId);
-        return { ...item._doc, productId: product };
+        const p = await Product.findById(item.productId);
+        return { ...item._doc, product: p ? normalizeProduct(p) : null };
       })
     );
 

@@ -44,9 +44,10 @@ function App() {
               <Route path="/product/makeup-products" element={<MakeupProducts />} />
               <Route path="/product/fragnance-products" element={<FragnanceProducts />} />
               <Route path="/product/skincare-products" element={<SkincareProducts />} />
-              <Route path="/product/haircare-products" element={<HaircareProducts />} />
+              <Route path="/product/hair-products" element={<HaircareProducts />} />
               <Route path="/product/tools-brushes-products" element={<ToolsBrushProducts />} />
               <Route path="/product/bath&body-products" element={<BathBodyProducts />} />
+     
             </Routes>
           </main>
 

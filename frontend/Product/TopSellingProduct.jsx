@@ -8,7 +8,6 @@ import { useCart } from "../src/context/CartContext";
 import LoginModal from "../Auth/loginmodal";
 import "./styles.css";
 
-
 export default function TopSellingProduct() {
   const [products, setProducts] = useState([]);
   const [hoveredProduct, setHoveredProduct] = useState(null);
@@ -24,13 +23,23 @@ export default function TopSellingProduct() {
   const productsPerPageDesktop = 5;
   const productsPerPageMobile = 2;
 
+  // 🔹 Fetch only "top" products
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/top-products`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`);
         if (!res.ok) throw new Error("Failed to fetch products");
         const data = await res.json();
-        setProducts(data);
+
+        // Safe filter: works if productType is array OR string
+        const topProducts = data.products.filter((p) => {
+          if (Array.isArray(p.productType)) {
+            return p.productType.includes("top");
+          }
+          return p.productType === "top";
+        });
+
+        setProducts(topProducts);
       } catch (error) {
         console.error(error);
       }
@@ -42,9 +51,14 @@ export default function TopSellingProduct() {
     const container = scrollContainerRef.current;
     if (!container) return;
     const isMobile = window.innerWidth < 768;
-    const productsPerPage = isMobile ? productsPerPageMobile : productsPerPageDesktop;
+    const productsPerPage = isMobile
+      ? productsPerPageMobile
+      : productsPerPageDesktop;
     const productWidth = container.clientWidth / productsPerPage;
-    container.scrollBy({ left: productWidth * productsPerPage * direction, behavior: "smooth" });
+    container.scrollBy({
+      left: productWidth * productsPerPage * direction,
+      behavior: "smooth",
+    });
   };
 
   const toggleFavorite = (productId) => {
@@ -91,13 +105,17 @@ export default function TopSellingProduct() {
 
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-base sm:text-xl font-bold text-gray-800 mb-3">
-          Top Selling Product
+          Top Selling Products
         </h2>
-        <Link to="/product" className="text-sm text-gray-600 hover:text-gray-900 underline">
+        <Link
+          to="/product"
+          className="text-sm text-gray-600 hover:text-gray-900 underline"
+        >
           View all
         </Link>
       </div>
 
+      {/* Arrows */}
       <button
         onClick={() => scrollByPage(-1)}
         className="hidden md:flex absolute top-1/2 left-2 -translate-y-1/2 z-20 bg-white border border-gray-300 rounded-full p-2 shadow hover:bg-gray-100"
@@ -112,7 +130,11 @@ export default function TopSellingProduct() {
         <ChevronRight className="w-5 h-5 text-gray-700" />
       </button>
 
-      <div ref={scrollContainerRef} className="overflow-x-auto scroll-smooth hide-scrollbar">
+      {/* Product List */}
+      <div
+        ref={scrollContainerRef}
+        className="overflow-x-auto scroll-smooth hide-scrollbar"
+      >
         <div className="flex gap-4">
           {products.map((product) => (
             <div key={product._id} className="flex-shrink-0 w-1/2 md:w-[20%]">
@@ -144,6 +166,10 @@ function ProductCard({
 }) {
   const [hoverCart, setHoverCart] = useState(false);
 
+  // 🔹 Safe image fallback
+  const mainImage =
+    product.images?.[product.thumbnailIndex]?.url || product.images?.[0]?.url;
+
   return (
     <div
       className="bg-white rounded-lg border border-gray-100 p-3 md:p-4 relative group hover:shadow-md transition-shadow duration-200 cursor-pointer"
@@ -154,32 +180,37 @@ function ProductCard({
       <button
         onClick={(e) => {
           e.stopPropagation();
-          e.preventDefault(); // Prevent navigation
+          e.preventDefault();
           onToggleFavorite();
         }}
         className="absolute top-2 right-2 z-10 p-1 rounded-full hover:bg-gray-100 transition-colors"
       >
         <Heart
-          className={`w-4 h-4 ${isFavorite ? "fill-red-500 text-red-500" : "text-gray-400 hover:text-red-500"
-            }`}
+          className={`w-4 h-4 ${
+            isFavorite
+              ? "fill-red-500 text-red-500"
+              : "text-gray-400 hover:text-red-500"
+          }`}
         />
       </button>
 
-      {/* 🖼️ Product Image (wrapped in Link) */}
+      {/* 🖼️ Product Image */}
       <Link to={`/product/${product._id}`} className="block relative mb-3">
         <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden relative">
           <img
-            src={product.images?.[product.thumbnailIndex || 0]?.url}
+            src={mainImage}
             alt={product.name}
-            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${isHovered ? "opacity-0" : "opacity-100"
-              }`}
+            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${
+              isHovered ? "opacity-0" : "opacity-100"
+            }`}
           />
-          {product.hoverImageUrl && (
+          {product.images?.[1]?.url && (
             <img
-              src={product.hoverImageUrl}
+              src={product.images[1].url}
               alt={`${product.name} - alternate view`}
-              className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-0"
-                }`}
+              className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${
+                isHovered ? "opacity-100" : "opacity-0"
+              }`}
             />
           )}
         </div>
@@ -189,7 +220,6 @@ function ProductCard({
       <div className="space-y-1">
         <p className="text-xs font-medium text-gray-900">{product.brand}</p>
 
-        {/* Name wrapped in Link */}
         <Link to={`/product/${product._id}`}>
           <h3 className="text-xs md:text-sm text-gray-700 line-clamp-2 leading-tight hover:underline">
             {product.name}
@@ -197,9 +227,11 @@ function ProductCard({
         </Link>
 
         <div className="flex items-center justify-between pt-2">
-          <span className="text-sm font-semibold text-red-600">৳ {product.price}</span>
+          <span className="text-sm font-semibold text-red-600">
+            ৳ {product.price}
+          </span>
 
-          {/* 🛒 Add to Cart Button */}
+          {/* 🛒 Add to Cart */}
           <button
             onMouseEnter={() => setHoverCart(true)}
             onMouseLeave={() => setHoverCart(false)}
@@ -207,13 +239,14 @@ function ProductCard({
             onTouchEnd={() => setHoverCart(false)}
             onClick={(e) => {
               e.stopPropagation();
-              e.preventDefault(); // Prevent navigation
+              e.preventDefault();
               onAddToCart();
             }}
-            className={`p-1.5 rounded-md transition-colors ${hoverCart
+            className={`p-1.5 rounded-md transition-colors ${
+              hoverCart
                 ? "bg-red-500 text-white"
                 : "bg-gray-900 text-white hover:bg-gray-800"
-              }`}
+            }`}
           >
             <ShoppingCart className="w-3 h-3" />
           </button>
@@ -222,4 +255,3 @@ function ProductCard({
     </div>
   );
 }
-

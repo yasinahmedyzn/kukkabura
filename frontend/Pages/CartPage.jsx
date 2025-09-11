@@ -11,10 +11,26 @@ const CartPage = () => {
     fetchCart();
   }, []);
 
-  const subtotal = items.reduce(
-    (sum, item) => sum + (item.productId?.price || 0) * item.quantity,
-    0
-  );
+  if (loading) return <p className="text-center mt-10">Loading cart...</p>;
+
+  if (!items || items.length === 0)
+    return (
+      <div className="text-center mt-10">
+        <h2 className="text-xl font-bold mb-4">Your cart is empty 🛒</h2>
+        <Link to="/" className="text-blue-500 underline hover:text-blue-700">
+          Go shopping
+        </Link>
+      </div>
+    );
+
+  // Calculate subtotal correctly
+  const subtotal = items.reduce((sum, item) => {
+    const product = item.product || item.productId;
+    if (!product) return sum;
+    const hasDiscount = product.discountPrice && product.discountPrice < product.price;
+    const price = hasDiscount ? product.discountPrice : product.price;
+    return sum + price * (item.quantity || 1);
+  }, 0);
 
   const handleProceedToPay = async () => {
     try {
@@ -46,28 +62,10 @@ const CartPage = () => {
         alert("Failed to initiate payment. Please try again.");
       }
     } catch (error) {
-      console.error("Payment initiation error:", error);
+      console.error(error);
       alert("Something went wrong while initiating the payment.");
     }
   };
-
-  if (loading) {
-    return <p className="text-center mt-10 text-gray-500">Loading cart...</p>;
-  }
-
-  if (items.length === 0) {
-    return (
-      <div className="text-center mt-10">
-        <h2 className="text-xl font-bold mb-4">Your cart is empty 🛒</h2>
-        <Link
-          to="/"
-          className="text-blue-500 underline hover:text-blue-700 transition"
-        >
-          Go shopping
-        </Link>
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-5xl mx-auto p-4">
@@ -75,8 +73,12 @@ const CartPage = () => {
 
       <div className="space-y-4">
         {items.map((item) => {
-          const product = item.productId;
+          const product = item.product || item.productId;
           if (!product) return null;
+
+          const hasDiscount = product.discountPrice && product.discountPrice < product.price;
+          const pricePerItem = hasDiscount ? product.discountPrice : product.price;
+          const totalPrice = pricePerItem * (item.quantity || 1);
 
           return (
             <div
@@ -86,13 +88,25 @@ const CartPage = () => {
               {/* Product Info */}
               <div className="flex items-center space-x-4 w-full md:w-1/2">
                 <img
-                  src={product.image || product.imageUrl || "/placeholder.jpg"}
-                  alt={product.name}
+                  src={product.images?.[0]?.url || "/placeholder.jpg"}
+                  alt={product.name || "Product"}
                   className="w-20 h-20 object-cover rounded-md"
                 />
                 <div>
-                  <h3 className="font-semibold text-lg">{product.name}</h3>
-                  <p className="text-gray-500">${product.price}</p>
+                  <h3 className="font-semibold text-lg">{product.name || "Unnamed Product"}</h3>
+                  <p className="text-gray-500">
+                    {hasDiscount ? (
+                      <>
+                        <span className="line-through mr-1">৳ {product.price}</span>
+                        <span className="text-red-600 font-bold">৳ {product.discountPrice}</span>
+                        {product.discountPercentage && (
+                          <span className="ml-1 text-xs text-red-500">(-{product.discountPercentage}%)</span>
+                        )}
+                      </>
+                    ) : (
+                      <>৳ {product.price || 0}</>
+                    )}
+                  </p>
                 </div>
               </div>
 
@@ -101,24 +115,22 @@ const CartPage = () => {
                 <div className="flex items-center border rounded-lg">
                   <button
                     onClick={() =>
-                      updateQty(product._id, Math.max(1, item.quantity - 1))
+                      updateQty(product._id, Math.max(1, (item.quantity || 1) - 1))
                     }
                     className="p-2 hover:bg-gray-100"
                   >
                     <Minus size={16} />
                   </button>
-                  <span className="px-4">{item.quantity}</span>
+                  <span className="px-4">{item.quantity || 1}</span>
                   <button
-                    onClick={() => updateQty(product._id, item.quantity + 1)}
+                    onClick={() => updateQty(product._id, (item.quantity || 1) + 1)}
                     className="p-2 hover:bg-gray-100"
                   >
                     <Plus size={16} />
                   </button>
                 </div>
 
-                <p className="font-bold text-gray-700">
-                  ${(product.price || 0) * item.quantity}
-                </p>
+                <p className="font-bold text-gray-700">৳ {totalPrice}</p>
 
                 <button
                   onClick={() => remove(product._id)}
@@ -137,24 +149,19 @@ const CartPage = () => {
         <h2 className="text-lg font-bold mb-4">🧾 Order Summary</h2>
         <div className="flex justify-between font-bold text-lg border-t pt-2">
           <span>Total</span>
-          <span>${subtotal.toFixed(2)}</span>
+          <span>৳ {subtotal}</span>
         </div>
 
         <div className="mt-4 flex flex-col space-y-2">
           <button
             onClick={handleProceedToPay}
-            className="bg-green-500 text-white py-2 rounded-lg 
-             hover:bg-green-600 
-             active:bg-green-700 
-             active:scale-95 
-             transition duration-150 ease-in-out 
-             transform focus:outline-none w-full"
+            className="bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 w-full"
           >
             Proceed to Checkout
           </button>
           <button
             onClick={clearCart}
-            className="bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition"
+            className="bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 w-full"
           >
             Clear Cart
           </button>

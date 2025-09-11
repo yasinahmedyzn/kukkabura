@@ -1,18 +1,12 @@
 import React from "react";
 import AdminCarouselDashboard from "../Admin/Frontpage/AdminCarouselManager";
-import AdminTopSellingProductsDashboard from "../Admin/Frontpage/AdminTopSellingProductsDashboard";
-import AdminNewProduct from "../Admin/Frontpage/AdminNewProductsDashboard";
-import AdminDiscountProduct from "../Admin/Frontpage/AdminDiscountProductsDashboard";
-import AdminAddProduct from "../Admin/AdminAddProductDashboard";
+import AdminProductDashboard from "../Admin/Frontpage/AdminProductDashboard";
 
 const Admin_dashboard = () => {
   return (
     <div>
       <AdminCarouselDashboard />
-      <AdminAddProduct />
-      <AdminTopSellingProductsDashboard />
-      <AdminNewProduct />
-      <AdminDiscountProduct />
+      <AdminProductDashboard />
     </div>
 
   );

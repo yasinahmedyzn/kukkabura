@@ -23,13 +23,20 @@ export default function DiscountedProduct() {
   const productsPerPageDesktop = 5;
   const productsPerPageMobile = 2;
 
+  // Fetch products and filter discount products
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/discount-products`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`);
         if (!res.ok) throw new Error("Failed to fetch products");
         const data = await res.json();
-        setProducts(data);
+
+        // Filter products that have "discount" in productType
+        const discountProducts = data.products.filter(
+          (p) => Array.isArray(p.productType) && p.productType.includes("discount")
+        );
+
+        setProducts(discountProducts);
       } catch (error) {
         console.error(error);
       }
@@ -90,13 +97,14 @@ export default function DiscountedProduct() {
 
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-base sm:text-xl font-bold text-gray-800 mb-3">
-          60% Discount Product
+          Discount Products
         </h2>
         <Link to="/product" className="text-sm text-gray-600 hover:text-gray-900 underline">
           View all
         </Link>
       </div>
 
+      {/* Scroll Arrows */}
       <button
         onClick={() => scrollByPage(-1)}
         className="hidden md:flex absolute top-1/2 left-2 -translate-y-1/2 z-20 bg-white border border-gray-300 rounded-full p-2 shadow hover:bg-gray-100"
@@ -111,6 +119,7 @@ export default function DiscountedProduct() {
         <ChevronRight className="w-5 h-5 text-gray-700" />
       </button>
 
+      {/* Product List */}
       <div ref={scrollContainerRef} className="overflow-x-auto scroll-smooth hide-scrollbar">
         <div className="flex gap-4">
           {products.map((product) => (
@@ -132,16 +141,15 @@ export default function DiscountedProduct() {
   );
 }
 
-function ProductCard({
-  product,
-  isHovered,
-  isFavorite,
-  onHover,
-  onLeave,
-  onToggleFavorite,
-  onAddToCart
-}) {
+function ProductCard({ product, isHovered, isFavorite, onHover, onLeave, onToggleFavorite, onAddToCart }) {
   const [hoverCart, setHoverCart] = useState(false);
+
+  const mainImage = product.images?.[product.thumbnailIndex || 0]?.url || product.images?.[0]?.url;
+
+  // Calculate discounted price dynamically
+  const discountedPrice = product.discountPercentage
+    ? Math.round(product.price - (product.price * product.discountPercentage) / 100)
+    : product.price;
 
   return (
     <div
@@ -149,78 +157,64 @@ function ProductCard({
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
     >
-      {/* ❤️ Favorite Button */}
+      {/* Favorite Button */}
       <button
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault(); // Prevent navigation
-          onToggleFavorite();
-        }}
+        onClick={(e) => { e.stopPropagation(); e.preventDefault(); onToggleFavorite(); }}
         className="absolute top-2 right-2 z-10 p-1 rounded-full hover:bg-gray-100 transition-colors"
       >
-        <Heart
-          className={`w-4 h-4 ${isFavorite ? "fill-red-500 text-red-500" : "text-gray-400 hover:text-red-500"
-            }`}
-        />
+        <Heart className={`w-4 h-4 ${isFavorite ? "fill-red-500 text-red-500" : "text-gray-400 hover:text-red-500"}`} />
       </button>
 
-      {/* 📸 Product Image - wrapped in Link */}
+      {/* Product Image */}
       <Link to={`/product/${product._id}`} className="block relative mb-3">
         <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden relative">
           <img
-            src={product.images?.[product.thumbnailIndex || 0]?.url}
+            src={mainImage}
             alt={product.name}
-            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${isHovered ? "opacity-0" : "opacity-100"
-              }`}
+            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${isHovered ? "opacity-0" : "opacity-100"}`}
           />
-          {product.hoverImageUrl && (
+          {product.images?.[1]?.url && (
             <img
-              src={product.hoverImageUrl}
+              src={product.images[1].url}
               alt={`${product.name} - alternate view`}
-              className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-0"
-                }`}
+              className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-0"}`}
             />
           )}
         </div>
       </Link>
 
-      {/* 📝 Product Info */}
+      {/* Product Info */}
       <div className="space-y-1">
         <p className="text-xs font-medium text-gray-900">{product.brand}</p>
 
-        {/* 🧾 Product Name - wrapped in Link */}
         <Link to={`/product/${product._id}`}>
           <h3 className="text-xs md:text-sm text-gray-700 line-clamp-2 leading-tight hover:underline">
             {product.name}
           </h3>
         </Link>
 
-        {/* 💰 Price & Cart */}
         <div className="flex items-center justify-between pt-2">
           <div>
-            <span className="text-xs text-gray-400 line-through block">
-              ৳ {product.price}
-            </span>
-            <span className="text-sm font-semibold text-red-600 block">
-              ৳ {product.discprice}
-            </span>
+            {product.discountPercentage > 0 && (
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-gray-400 line-through">৳ {product.price}</span>
+                <span className="text-sm font-semibold text-red-600">৳ {discountedPrice}</span>
+                <span className="text-xs text-white bg-red-500 px-1 rounded">-{product.discountPercentage}%</span>
+              </div>
+            )}
+            {product.discountPercentage === 0 && (
+              <span className="text-sm font-semibold text-gray-900">৳ {product.price}</span>
+            )}
           </div>
 
-          {/* 🛒 Add to Cart Button */}
+          {/* Add to Cart */}
           <button
             onMouseEnter={() => setHoverCart(true)}
             onMouseLeave={() => setHoverCart(false)}
             onTouchStart={() => setHoverCart(true)}
             onTouchEnd={() => setHoverCart(false)}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault(); // Prevent navigation
-              onAddToCart();
-            }}
-            className={`p-1.5 rounded-md transition-colors ${hoverCart
-                ? "bg-red-500 text-white"
-                : "bg-gray-900 text-white hover:bg-gray-800"
-              }`}
+            onClick={(e) => { e.stopPropagation(); e.preventDefault(); onAddToCart(); }}
+            className={`p-1.5 rounded-md transition-colors ${hoverCart ? "bg-red-500 text-white" : "bg-gray-900 text-white hover:bg-gray-800"}`}
           >
             <ShoppingCart className="w-3 h-3" />
           </button>

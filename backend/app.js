@@ -36,28 +36,12 @@ app.use("/api/auth", authRoutes);
 const carouselRoutes = require("./routes/carouselImages");
 app.use("/api/carousel-images", carouselRoutes);
 
-//add product routes
-const addProductsRoutes = require("./routes/addProducts.js");
-app.use("/api/add-products", addProductsRoutes);
-
-//top product routes
-const topProductsRoutes = require("./routes/topProducts.js");
-app.use("/api/top-products", topProductsRoutes);
-
-//new product routes
-const newProductsRoutes = require("./routes/newProduct.js");
-app.use("/api/new-products", newProductsRoutes);
-
-//Discount Product Routes
-const discountProductsRoutes = require("./routes/discountProducts.js");
-app.use("/api/discount-products", discountProductsRoutes);
-
 //cart
 const cartRoutes = require("./routes/cart");
 app.use("/api/cart", cartRoutes);
 
 //product fetch
-const productRoutes = require("./routes/products");
+const productRoutes = require("./routes/productRoutes");
 app.use("/api/products", productRoutes);
 
 //payment route

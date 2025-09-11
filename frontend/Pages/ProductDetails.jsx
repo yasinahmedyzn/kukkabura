@@ -8,18 +8,27 @@ export default function ProductDetails() {
   const [product, setProduct] = useState(null);
   const [mainImgIdx, setMainImgIdx] = useState(0);
   const [openSections, setOpenSections] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
+    setLoading(true);
     axios
-      .get(`${import.meta.env.VITE_API_URL}/api/products/details/${id}`)
+      .get(`${import.meta.env.VITE_API_URL}/api/products/${id}`)
       .then((res) => {
         setProduct(res.data);
         setMainImgIdx(res.data.thumbnailIndex || 0);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error("Error fetching product:", err);
+        setError("Failed to load product. Please try again later.");
+      })
+      .finally(() => setLoading(false));
   }, [id]);
 
-  if (!product) return <p className="text-center p-4">Loading...</p>;
+  if (loading) return <p className="text-center p-4">Loading...</p>;
+  if (error) return <p className="text-center p-4 text-red-600">{error}</p>;
+  if (!product) return <p className="text-center p-4">No product found</p>;
 
   const discountPercent =
     product.price && product.discountPrice < product.price
@@ -52,7 +61,7 @@ export default function ProductDetails() {
             <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
           </button>
         )}
-        {mainImgIdx < product.images.length - 1 && (
+        {mainImgIdx < (product.images?.length || 1) - 1 && (
           <button
             onClick={() => setMainImgIdx((i) => Math.min(i + 1, product.images.length - 1))}
             className="absolute top-1/2 right-1 md:right-2 -translate-y-1/2 bg-white shadow rounded-full p-1.5 md:p-2 hover:bg-gray-100"
@@ -82,12 +91,6 @@ export default function ProductDetails() {
         {/* Breadcrumb */}
         <p className="text-xs md:text-sm text-gray-400 mb-2 flex flex-wrap gap-1">
           <Link to="/" className="hover:text-gray-600">Home</Link> /
-          <Link
-            to={`/product/${product.category}-products`}
-            className="hover:text-gray-600"
-          >
-            {product.category}
-          </Link> /
           <span className="text-gray-700">{product.name}</span>
         </p>
 
@@ -152,10 +155,7 @@ export default function ProductDetails() {
             { key: "benefits", label: "Benefits", content: product.benefits },
             { key: "uses", label: "Recommended Uses For Product", content: product.uses },
           ].map((section) => (
-            <div
-              key={section.key}
-              className="border-b border-gray-200/70 pb-2"
-            >
+            <div key={section.key} className="border-b border-gray-200/70 pb-2">
               <button
                 onClick={() => toggleSection(section.key)}
                 className="flex items-center justify-between w-full text-left font-medium text-gray-700 text-sm md:text-base"

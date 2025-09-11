@@ -17,7 +17,7 @@ const callouts = [
       "https://www.hkvitals.com/blog/wp-content/uploads/2023/08/900-29.jpg",
     imageAlt:
       "Wood table with porcelain mug, leather journal, brass pen, leather key ring, and a houseplant.",
-    href: "/product/haircare-products",
+    href: "/product/hair-products",
   },
   {
     name: "Tools & Brushes",

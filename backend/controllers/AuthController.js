@@ -6,6 +6,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "your_strong_secret";
 // ================= REGISTER =================
 exports.registerUser = async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
+  const adminEmails = process.env.ADMIN_EMAILS?.split(",") || [];
 
   try {
     const existingUser = await User.findOne({ email });
@@ -15,7 +16,7 @@ exports.registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // 👇 Assign role based on email
-    const role = email === "mdyasinahmed@gmail.com" ? "admin" : "user";
+    const role = adminEmails.includes(email) ? "admin" : "user";
 
     const user = new User({
       firstName,
