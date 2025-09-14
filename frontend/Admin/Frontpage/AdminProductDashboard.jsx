@@ -9,14 +9,20 @@ const productTypes = ["regular", "new", "discount", "top"];
 
 export default function AdminProductDashboard() {
   const [form, setForm] = useState({
-    brand: "", name: "", price: "", discountPercentage: 0, category: [], productType: [], images: [], thumbnailIndex: 0,
+    brand: "", name: "", price: "", discountPercentage: 0,
+    category: [], productType: [], images: [], thumbnailIndex: 0,
+    description: "", featuresDetails: "", ingredients: "",
+    activeIngredients: "", directions: "", benefits: "", recommendedUses: "",
   });
   const [products, setProducts] = useState([]);
   const [message, setMessage] = useState("");
   const [uploading, setUploading] = useState(false);
   const [editingProductId, setEditingProductId] = useState(null);
   const [editForm, setEditForm] = useState({
-    brand: "", name: "", price: "", discountPercentage: 0, category: [], productType: [], images: [], thumbnailIndex: 0,
+    brand: "", name: "", price: "", discountPercentage: 0,
+    category: [], productType: [], images: [], thumbnailIndex: 0,
+    description: "", featuresDetails: "", ingredients: "",
+    activeIngredients: "", directions: "", benefits: "", recommendedUses: "",
   });
   const [showImagesModal, setShowImagesModal] = useState(false);
   const [modalImages, setModalImages] = useState([]);
@@ -68,9 +74,9 @@ export default function AdminProductDashboard() {
 
   const handleUpload = async (e) => {
     e.preventDefault();
-    const { brand, name, price, discountPercentage, category, productType, images } = form;
+    const { brand, name, price, category, productType, images } = form;
     if (!brand || !name || !price || !category.length || !productType.length || !images.length) {
-      setMessage("Please fill all fields and upload at least one image.");
+      setMessage("Please fill all required fields.");
       return;
     }
     const formData = new FormData();
@@ -85,7 +91,12 @@ export default function AdminProductDashboard() {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setMessage("✅ Product added successfully!");
-      setForm({ brand: "", name: "", price: "", discountPercentage: 0, category: [], productType: [], images: [], thumbnailIndex: 0 });
+      setForm({
+        brand: "", name: "", price: "", discountPercentage: 0,
+        category: [], productType: [], images: [], thumbnailIndex: 0,
+        description: "", featuresDetails: "", ingredients: "",
+        activeIngredients: "", directions: "", benefits: "", recommendedUses: "",
+      });
       fileInputImages.current.value = null;
       fetchProducts();
     } catch (err) {
@@ -113,6 +124,13 @@ export default function AdminProductDashboard() {
       productType: Array.isArray(product.productType) ? product.productType : [product.productType],
       images: [],
       thumbnailIndex: product.thumbnailIndex || 0,
+      description: product.description || "",
+      featuresDetails: product.featuresDetails || "",
+      ingredients: product.ingredients || "",
+      activeIngredients: product.activeIngredients || "",
+      directions: product.directions || "",
+      benefits: product.benefits || "",
+      recommendedUses: product.recommendedUses || "",
     });
   };
 
@@ -186,6 +204,26 @@ export default function AdminProductDashboard() {
             <input type="number" name="price" placeholder="Price" value={form.price} onChange={handleChange} className="w-full border rounded px-2 py-1 text-xs" />
             <input type="number" name="discountPercentage" placeholder="Discount %" value={form.discountPercentage} onChange={handleChange} className="w-full border rounded px-2 py-1 text-xs" />
 
+            {/* Toggle More Fields */}
+            <button
+              type="button"
+              onClick={() => setForm(prev => ({ ...prev, showMoreFields: !prev.showMoreFields }))}
+              className="text-blue-600 text-xs underline"
+            >
+              {form.showMoreFields ? "Hide Extra Fields ▲" : "More Details ▼"}
+            </button>
+
+            {form.showMoreFields && (
+              <div className="space-y-2 border rounded p-2 bg-gray-50">
+                <textarea name="description" placeholder="Description" value={form.description || ""} onChange={handleChange} className="w-full border rounded px-2 py-1 text-xs" rows={2} />
+                <textarea name="featuresDetails" placeholder="Features & Details" value={form.featuresDetails || ""} onChange={handleChange} className="w-full border rounded px-2 py-1 text-xs" rows={2} />
+                <textarea name="ingredients" placeholder="Ingredients" value={form.ingredients || ""} onChange={handleChange} className="w-full border rounded px-2 py-1 text-xs" rows={2} />
+                <textarea name="activeIngredients" placeholder="Active Ingredient(s)" value={form.activeIngredients || ""} onChange={handleChange} className="w-full border rounded px-2 py-1 text-xs" rows={2} />
+                <textarea name="directions" placeholder="Directions" value={form.directions || ""} onChange={handleChange} className="w-full border rounded px-2 py-1 text-xs" rows={2} />
+                <textarea name="benefits" placeholder="Benefits" value={form.benefits || ""} onChange={handleChange} className="w-full border rounded px-2 py-1 text-xs" rows={2} />
+                <textarea name="recommendedUses" placeholder="Recommended Uses For Product" value={form.recommendedUses || ""} onChange={handleChange} className="w-full border rounded px-2 py-1 text-xs" rows={2} />
+              </div>
+            )}
             {/* Categories */}
             <h2 className="text-md font-semibold mb-2">Select Category</h2>
             <div className="flex flex-wrap gap-1">
@@ -230,12 +268,119 @@ export default function AdminProductDashboard() {
 
                 {editingProductId === p._id ? (
                   <div className="space-y-1">
-                    {/* Edit Form */}
-                    <input type="text" name="brand" value={editForm.brand} onChange={handleEditChange} className="w-full border rounded px-1 py-1 text-xs" placeholder="Brand" />
-                    <input type="text" name="name" value={editForm.name} onChange={handleEditChange} className="w-full border rounded px-1 py-1 text-xs" placeholder="Name" />
-                    <input type="number" name="price" value={editForm.price} onChange={handleEditChange} className="w-full border rounded px-1 py-1 text-xs" placeholder="Price" />
-                    <input type="number" name="discountPercentage" value={editForm.discountPercentage} onChange={handleEditChange} className="w-full border rounded px-1 py-1 text-xs" placeholder="Discount %" />
 
+                    {/* Edit Form */}
+                    <div className="space-y-2">
+                      <input
+                        type="text"
+                        name="brand"
+                        placeholder="Brand"
+                        value={editForm.brand || ""}
+                        onChange={handleEditChange}
+                        className="w-full border rounded px-2 py-1 text-xs"
+                      />
+                      <input
+                        type="text"
+                        name="name"
+                        placeholder="Name"
+                        value={editForm.name || ""}
+                        onChange={handleEditChange}
+                        className="w-full border rounded px-2 py-1 text-xs"
+                      />
+                      <input
+                        type="number"
+                        name="price"
+                        placeholder="Price"
+                        value={editForm.price || ""}
+                        onChange={handleEditChange}
+                        className="w-full border rounded px-2 py-1 text-xs"
+                      />
+                      <input
+                        type="number"
+                        name="discountPercentage"
+                        placeholder="Discount %"
+                        value={editForm.discountPercentage || ""}
+                        onChange={handleEditChange}
+                        className="w-full border rounded px-2 py-1 text-xs"
+                      />
+
+                      {/* Toggle Extra Fields */}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setEditForm(prev => ({
+                            ...prev,
+                            showEditMoreFields: !prev.showEditMoreFields,
+                          }))
+                        }
+                        className="text-blue-600 text-xs underline"
+                      >
+                        {editForm.showEditMoreFields
+                          ? "Hide Extra Fields ▲"
+                          : "Edit More Details ▼"}
+                      </button>
+
+                      {editForm.showEditMoreFields && (
+                        <div className="space-y-2 border rounded p-2 bg-gray-50">
+                          <textarea
+                            name="description"
+                            placeholder="Description"
+                            value={editForm.description || ""}
+                            onChange={handleEditChange}
+                            className="w-full border rounded px-2 py-1 text-xs"
+                            rows={2}
+                          />
+                          <textarea
+                            name="featuresDetails"
+                            placeholder="Features & Details"
+                            value={editForm.featuresDetails || ""}
+                            onChange={handleEditChange}
+                            className="w-full border rounded px-2 py-1 text-xs"
+                            rows={2}
+                          />
+                          <textarea
+                            name="ingredients"
+                            placeholder="Ingredients"
+                            value={editForm.ingredients || ""}
+                            onChange={handleEditChange}
+                            className="w-full border rounded px-2 py-1 text-xs"
+                            rows={2}
+                          />
+                          <textarea
+                            name="activeIngredients"
+                            placeholder="Active Ingredient(s)"
+                            value={editForm.activeIngredients || ""}
+                            onChange={handleEditChange}
+                            className="w-full border rounded px-2 py-1 text-xs"
+                            rows={2}
+                          />
+                          <textarea
+                            name="directions"
+                            placeholder="Directions"
+                            value={editForm.directions || ""}
+                            onChange={handleEditChange}
+                            className="w-full border rounded px-2 py-1 text-xs"
+                            rows={2}
+                          />
+                          <textarea
+                            name="benefits"
+                            placeholder="Benefits"
+                            value={editForm.benefits || ""}
+                            onChange={handleEditChange}
+                            className="w-full border rounded px-2 py-1 text-xs"
+                            rows={2}
+                          />
+                          <textarea
+                            name="recommendedUses"
+                            placeholder="Recommended Uses For Product"
+                            value={editForm.recommendedUses || ""}
+                            onChange={handleEditChange}
+                            className="w-full border rounded px-2 py-1 text-xs"
+                            rows={2}
+                          />
+                        </div>
+                      )}
+                    </div>
                     {/* Categories & Product Types Dropdown */}
                     <select multiple className="w-full border rounded px-1 py-1 text-xs mb-1" value={editForm.category} onChange={e => setEditForm({ ...editForm, category: Array.from(e.target.selectedOptions, option => option.value) })}>
                       {categoriesList.map(cat => <option key={cat} value={cat}>{cat}</option>)}

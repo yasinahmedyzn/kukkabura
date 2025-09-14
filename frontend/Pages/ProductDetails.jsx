@@ -75,9 +75,8 @@ export default function ProductDetails() {
           {product.images?.map((img, i) => (
             <div
               key={i}
-              className={`w-16 h-16 md:w-20 md:h-20 rounded-md overflow-hidden border cursor-pointer flex-shrink-0 ${
-                mainImgIdx === i ? "border-red-500 bg-gray-100" : "border-gray-200"
-              }`}
+              className={`w-16 h-16 md:w-20 md:h-20 rounded-md overflow-hidden border cursor-pointer flex-shrink-0 ${mainImgIdx === i ? "border-red-500 bg-gray-100" : "border-gray-200"
+                }`}
               onClick={() => setMainImgIdx(i)}
             >
               <img src={img.url} alt="thumb" className="w-full h-full object-contain" />
@@ -148,12 +147,12 @@ export default function ProductDetails() {
         <div className="mt-6 md:mt-8 space-y-3">
           {[
             { key: "description", label: "Description", content: product.description },
-            { key: "features", label: "Features & Details", content: product.features },
+            { key: "featuresDetails", label: "Features & Details", content: product.featuresDetails },
             { key: "ingredients", label: "Ingredients", content: product.ingredients },
-            { key: "active", label: "Active Ingredient(s)", content: product.activeIngredients },
+            { key: "activeIngredients", label: "Active Ingredient(s)", content: product.activeIngredients },
             { key: "directions", label: "Directions", content: product.directions },
             { key: "benefits", label: "Benefits", content: product.benefits },
-            { key: "uses", label: "Recommended Uses For Product", content: product.uses },
+            { key: "recommendedUses", label: "Recommended Uses For Product", content: product.recommendedUses },
           ].map((section) => (
             <div key={section.key} className="border-b border-gray-200/70 pb-2">
               <button
@@ -162,9 +161,8 @@ export default function ProductDetails() {
               >
                 {section.label}
                 <Plus
-                  className={`w-4 h-4 md:w-5 md:h-5 transition-transform ${
-                    openSections[section.key] ? "rotate-45" : ""
-                  }`}
+                  className={`w-4 h-4 md:w-5 md:h-5 transition-transform ${openSections[section.key] ? "rotate-45" : ""
+                    }`}
                 />
               </button>
               {openSections[section.key] && (

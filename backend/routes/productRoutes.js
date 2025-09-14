@@ -44,7 +44,17 @@ function normalizeProduct(p) {
     discountPrice: p.price - (p.price * (p.discountPercentage || 0)) / 100,
     images: p.images || [],
     thumbnailIndex: p.thumbnailIndex || 0,
-    hoverImageUrl: p.images?.[1]?.url || null, // 👈 auto hover image
+    hoverImageUrl: p.images?.[1]?.url || null,
+
+    // ✅ New fields
+    description: p.description || "",
+    featuresDetails: p.featuresDetails || "",
+    ingredients: p.ingredients || "",
+    activeIngredients: p.activeIngredients || "",
+    directions: p.directions || "",
+    benefits: p.benefits || "",
+    recommendedUses: p.recommendedUses || "",
+
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
   };
@@ -55,7 +65,21 @@ function normalizeProduct(p) {
 // =========================================================
 router.post("/", upload.array("images", 10), async (req, res) => {
   try {
-    const { brand, name, price, thumbnailIndex, discountPercentage } = req.body;
+    const {
+      brand,
+      name,
+      price,
+      thumbnailIndex,
+      discountPercentage,
+      description,
+      featuresDetails,
+      ingredients,
+      activeIngredients,
+      directions,
+      benefits,
+      recommendedUses,
+    } = req.body;
+
     const category = normalizeField(req.body, "category");
     const productType = normalizeField(req.body, "productType");
 
@@ -80,6 +104,15 @@ router.post("/", upload.array("images", 10), async (req, res) => {
       images,
       thumbnailIndex: Number(thumbnailIndex) || 0,
       discountPercentage: discountPercentage || 0,
+
+      // ✅ New fields
+      description,
+      featuresDetails,
+      ingredients,
+      activeIngredients,
+      directions,
+      benefits,
+      recommendedUses,
     });
 
     await product.save();
@@ -161,7 +194,21 @@ router.put("/:id", upload.array("images", 10), async (req, res) => {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: "Product not found" });
 
-    const { brand, name, price, thumbnailIndex, discountPercentage, deleteImagePublicId } = req.body;
+    const {
+      brand,
+      name,
+      price,
+      thumbnailIndex,
+      discountPercentage,
+      deleteImagePublicId,
+      description,
+      featuresDetails,
+      ingredients,
+      activeIngredients,
+      directions,
+      benefits,
+      recommendedUses,
+    } = req.body;
 
     if (brand !== undefined) product.brand = brand;
     if (name !== undefined) product.name = name;
@@ -174,6 +221,16 @@ router.put("/:id", upload.array("images", 10), async (req, res) => {
     const nextType = normalizeField(req.body, "productType");
     if (nextType.length) product.productType = nextType;
 
+    // ✅ Update new fields
+    if (description !== undefined) product.description = description;
+    if (featuresDetails !== undefined) product.featuresDetails = featuresDetails;
+    if (ingredients !== undefined) product.ingredients = ingredients;
+    if (activeIngredients !== undefined) product.activeIngredients = activeIngredients;
+    if (directions !== undefined) product.directions = directions;
+    if (benefits !== undefined) product.benefits = benefits;
+    if (recommendedUses !== undefined) product.recommendedUses = recommendedUses;
+
+    // ✅ Replace images
     if (req.files && req.files.length) {
       for (const img of product.images) {
         await cloudinary.uploader.destroy(img.publicId);
@@ -184,10 +241,12 @@ router.put("/:id", upload.array("images", 10), async (req, res) => {
       }));
     }
 
+    // ✅ Update thumbnail index
     if (thumbnailIndex !== undefined) {
       product.thumbnailIndex = Number(thumbnailIndex);
     }
 
+    // ✅ Delete image if requested
     if (deleteImagePublicId) {
       const idx = product.images.findIndex(img => img.publicId === deleteImagePublicId);
       if (idx !== -1) {

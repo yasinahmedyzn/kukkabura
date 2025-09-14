@@ -30,6 +30,14 @@ const productSchema = new mongoose.Schema(
 
     // If discount product
     discountPercentage: { type: Number, default: 0 },
+
+    description: { type: String, default: "" },
+    featuresDetails: { type: String, default: "" },
+    ingredients: { type: String, default: "" },
+    activeIngredients: { type: String, default: "" },
+    directions: { type: String, default: "" },
+    benefits: { type: String, default: "" },
+    recommendedUses: { type: String, default: "" },
   },
   { timestamps: true }
 );
