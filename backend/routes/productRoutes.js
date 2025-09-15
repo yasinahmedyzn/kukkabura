@@ -308,4 +308,30 @@ router.get("/all/brands", async (req, res) => {
   }
 });
 
+// =========================================================
+// SEARCH PRODUCTS (by name, description, category, brand)
+// =========================================================
+router.get("/search/query", async (req, res) => {
+  try {
+    const q = req.query.q;
+    if (!q || !q.trim()) return res.json([]);
+
+    const regex = new RegExp(q, "i"); // case-insensitive
+
+    const products = await Product.find({
+      $or: [
+        { name: regex },
+        { brand: regex },
+        { description: regex },
+        { category: { $in: [regex] } } // matches array elements
+      ],
+    }).limit(20);
+
+    res.json(products); // return full products for now
+  } catch (err) {
+    console.error("Search error:", err);
+    res.status(500).json({ message: "Server error: " + err.message });
+  }
+});
+
 module.exports = router;

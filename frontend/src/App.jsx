@@ -20,6 +20,7 @@ import LipProducts from "../Pages/Lip.jsx";
 import Profile from "../Auth/Profile.jsx";
 import Footer from "../Footer/Footer.jsx";
 import ProductDetails from "../Pages/ProductDetails.jsx";
+import SearchResults from "../Pages/SearchResults.jsx";
 
 function App() {
   return (
@@ -47,6 +48,8 @@ function App() {
               <Route path="/product/hair-products" element={<HaircareProducts />} />
               <Route path="/product/tools-brushes-products" element={<ToolsBrushProducts />} />
               <Route path="/product/bath&body-products" element={<BathBodyProducts />} />
+               <Route path="/search" element={<SearchResults />} />
+
      
             </Routes>
           </main>

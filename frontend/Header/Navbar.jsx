@@ -27,6 +27,8 @@ const Navbar = () => {
   const profileRefMobile = useRef(null);
   const searchRef = useRef(null);
 
+  const [searchTerm, setSearchTerm] = useState("");
+
   const navigate = useNavigate();
   const { user, logout } = useContext(AuthContext);
 
@@ -86,6 +88,16 @@ const Navbar = () => {
     logout();
     navigate("/login");
     clearCart();
+  };
+
+  const doSearch = (term) => {
+    const q = (term || searchTerm || "").trim();
+    if (!q) return;
+    navigate(`/search?q=${encodeURIComponent(q)}`);
+    setSearchTerm("");
+    setShowSearchBar(false);
+    setShowDropdown(false);
+    setShowProfileDropdown(false);
   };
 
   return (
@@ -154,10 +166,16 @@ const Navbar = () => {
                 type="text"
                 placeholder="Search for anything"
                 className="w-full px-4 py-2 focus:outline-none"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") doSearch(searchTerm);
+                }}
               />
               <button
                 className="px-4 py-2 text-gray-700 hover:text-orange-600"
                 type="button"
+                onClick={() => doSearch(searchTerm)}
               >
                 <FaSearch />
               </button>
@@ -384,15 +402,26 @@ const Navbar = () => {
         {showSearchBar && (
           <div
             ref={searchRef}
-            className="absolute right-2 top-12 bg-white/80 border border-gray-300 rounded-md flex items-center px-2 py-1 shadow-md"
+            className="absolute left-2 right-2 top-12 bg-white border border-gray-300 rounded-md flex items-center px-2 py-1 shadow-md z-50"
             onClick={(e) => e.stopPropagation()}
           >
             <input
               type="text"
               placeholder="Search..."
-              className="px-1 py-0.5 text-sm w-[120px] bg-transparent focus:outline-none"
+              className="px-2 py-1 text-sm w-full bg-transparent focus:outline-none"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") doSearch(searchTerm);
+              }}
             />
-            <FaSearch size={14} />
+            <button
+              type="button"
+              onClick={() => doSearch(searchTerm)}
+              className="ml-2 text-gray-700 hover:text-orange-600"
+            >
+              <FaSearch size={16} />
+            </button>
           </div>
         )}
 
@@ -400,7 +429,7 @@ const Navbar = () => {
         {showDropdown && (
           <div
             ref={dropdownRefMobile}
-            className="absolute right-2 top-12 w-[180px] bg-white/80 border border-gray-200 rounded-md shadow-lg z-50"
+            className="absolute right-2 top-12 w-[180px] bg-white border border-gray-200 rounded-md shadow-lg z-50"
             onClick={(e) => e.stopPropagation()}
           >
             <ul className="text-sm">
