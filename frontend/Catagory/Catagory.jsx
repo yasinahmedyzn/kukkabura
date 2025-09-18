@@ -5,7 +5,7 @@ const callouts = [
     name: "Skin Care",
     description: "Cleansers, creams & treatments for radiant skin",
     imageSrc:
-      "https://www.bellobello.my/wp-content/uploads/2022/08/boldlipessentials-2.jpg",
+      "https://img.freepik.com/premium-photo/3d-render-blank-cosmetics-skincare-product-packaging-mock-up-terrazzo-design-beauty-soap-spa-concept-lotion-oil-moisture-skin-health-premium-luxury-design-branding_106651-2722.jpg",
     imageAlt:
       "Desk with leather desk pad, walnut desk organizer, wireless keyboard and mouse, and porcelain mug.",
     href: "/product/skincare-products",
