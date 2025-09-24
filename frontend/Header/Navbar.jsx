@@ -130,6 +130,7 @@ const Navbar = () => {
 
               {showDropdown && (
                 // prevent clicks inside the dropdown from bubbling to document
+
                 <div
                   className="absolute top-16 left-0 z-50 w-64 max-h-[400px] overflow-y-auto rounded-md bg-white shadow-xl border border-gray-200"
                   onClick={(e) => e.stopPropagation()}
@@ -150,7 +151,9 @@ const Navbar = () => {
                         key={item}
                         className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                       >
-                        {item}
+                        <Link to={`/product/${item.toLowerCase().replace(/\s+/g, "-")}-products`}>
+                          {item}
+                        </Link>
                       </li>
                     ))}
                   </ul>
@@ -446,9 +449,11 @@ const Navbar = () => {
               ].map((item) => (
                 <li
                   key={item}
-                  className="px-3 py-1 hover:bg-gray-100 cursor-pointer"
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                 >
-                  {item}
+                  <Link to={`/product/${item.toLowerCase().replace(/\s+/g, "-")}-products`}>
+                    {item}
+                  </Link>
                 </li>
               ))}
             </ul>

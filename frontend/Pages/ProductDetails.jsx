@@ -1,7 +1,9 @@
 import { useParams, Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { Heart, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { useCart } from "../src/context/CartContext";   // ✅ cart context
+import { AuthContext } from "../src/context/AuthContext"; // ✅ auth context
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -10,7 +12,12 @@ export default function ProductDetails() {
   const [openSections, setOpenSections] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [toast, setToast] = useState(null);
 
+  const { addToCart } = useCart();
+  const { user } = useContext(AuthContext);
+
+  // 🔹 Fetch product details
   useEffect(() => {
     setLoading(true);
     axios
@@ -26,6 +33,24 @@ export default function ProductDetails() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  // 🔹 Add to Cart Handler
+  const handleAddToCart = async () => {
+    if (!user) {
+      setToast("Please login to add items to cart");
+      setTimeout(() => setToast(null), 2000);
+      return;
+    }
+
+    await addToCart(product._id, 1);
+    setToast("Item added to cart!");
+    setTimeout(() => setToast(null), 2000);
+  };
+
+  // 🔹 Section toggle
+  const toggleSection = (section) => {
+    setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
+  };
+
   if (loading) return <p className="text-center p-4">Loading...</p>;
   if (error) return <p className="text-center p-4 text-red-600">{error}</p>;
   if (!product) return <p className="text-center p-4">No product found</p>;
@@ -35,13 +60,16 @@ export default function ProductDetails() {
       ? Math.round(((product.price - product.discountPrice) / product.price) * 100)
       : 0;
 
-  const toggleSection = (section) => {
-    setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
-  };
-
   return (
     <div className="max-w-6xl mx-auto p-3 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
-      {/* Left - Product Images */}
+      {/* ✅ Toast */}
+      {toast && (
+        <div className="fixed top-5 right-5 bg-green-500 text-white px-4 py-2 rounded shadow-md z-50">
+          {toast}
+        </div>
+      )}
+
+      {/* ---------------- Left - Product Images ---------------- */}
       <div className="relative">
         {/* Main Image */}
         <div className="w-full aspect-square bg-gray-50 rounded-lg shadow overflow-hidden">
@@ -75,8 +103,9 @@ export default function ProductDetails() {
           {product.images?.map((img, i) => (
             <div
               key={i}
-              className={`w-16 h-16 md:w-20 md:h-20 rounded-md overflow-hidden border cursor-pointer flex-shrink-0 ${mainImgIdx === i ? "border-red-500 bg-gray-100" : "border-gray-200"
-                }`}
+              className={`w-16 h-16 md:w-20 md:h-20 rounded-md overflow-hidden border cursor-pointer flex-shrink-0 ${
+                mainImgIdx === i ? "border-red-500 bg-gray-100" : "border-gray-200"
+              }`}
               onClick={() => setMainImgIdx(i)}
             >
               <img src={img.url} alt="thumb" className="w-full h-full object-contain" />
@@ -85,7 +114,7 @@ export default function ProductDetails() {
         </div>
       </div>
 
-      {/* Right - Product Info */}
+      {/* ---------------- Right - Product Info ---------------- */}
       <div>
         {/* Breadcrumb */}
         <p className="text-xs md:text-sm text-gray-400 mb-2 flex flex-wrap gap-1">
@@ -135,7 +164,10 @@ export default function ProductDetails() {
         {/* Stock + Cart */}
         <div className="mt-4 flex items-center gap-3">
           <span className="text-green-600 text-xs md:text-sm">✓ In Stock</span>
-          <button className="flex-1 md:flex-none px-4 md:px-6 py-2 bg-yellow-400 hover:bg-yellow-500 rounded-lg shadow font-medium text-sm md:text-base">
+          <button
+            onClick={handleAddToCart}
+            className="flex-1 md:flex-none px-4 md:px-6 py-2 bg-yellow-400 hover:bg-yellow-500 rounded-lg shadow font-medium text-sm md:text-base"
+          >
             Add to Cart
           </button>
           <button className="p-1.5 md:p-2 border rounded-full hover:bg-gray-100">
@@ -161,8 +193,9 @@ export default function ProductDetails() {
               >
                 {section.label}
                 <Plus
-                  className={`w-4 h-4 md:w-5 md:h-5 transition-transform ${openSections[section.key] ? "rotate-45" : ""
-                    }`}
+                  className={`w-4 h-4 md:w-5 md:h-5 transition-transform ${
+                    openSections[section.key] ? "rotate-45" : ""
+                  }`}
                 />
               </button>
               {openSections[section.key] && (

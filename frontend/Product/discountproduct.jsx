@@ -203,7 +203,7 @@ function ProductCard({ product, isHovered, isFavorite, onHover, onLeave, onToggl
               </div>
             )}
             {product.discountPercentage === 0 && (
-              <span className="text-sm font-semibold text-gray-900">৳ {product.price}</span>
+              <span className="text-sm font-semibold text-red-600">৳ {product.price}</span>
             )}
           </div>
 
